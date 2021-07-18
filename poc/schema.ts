@@ -1,4 +1,5 @@
 import { gql } from './util'
+import { IDirectiveResolvers } from '@graphql-tools/utils'
 import { KnexGql } from './knex-gql'
 import createKnex from 'knex'
 import { knexLittleLogger } from 'knex-little-logger'
@@ -13,9 +14,6 @@ knexLittleLogger(knex)
 
 const typeDefs = gql`
   directive @stringReplace(str: String, with: String) on FIELD_DEFINITION
-  directive @find on FIELD_DEFINITION
-  directive @create on FIELD_DEFINITION
-  directive @table(name: String!) on OBJECT
 
   type User @table(name: "users") {
     id: ID!
@@ -23,6 +21,7 @@ const typeDefs = gql`
   }
 
   input UserInput {
+    id: ID!
     name: String!
   }
 
@@ -35,4 +34,12 @@ const typeDefs = gql`
   }
 `
 
-export const knexGql = new KnexGql({ knex, typeDefs })
+const directiveResolvers: IDirectiveResolvers = {
+  stringReplace(next, _root, args) {
+    return next().then((name: string) => {
+      return name.replace(args['str'], args['with'])
+    })
+  },
+}
+
+export const knexGql = new KnexGql({ knex, typeDefs, directiveResolvers })

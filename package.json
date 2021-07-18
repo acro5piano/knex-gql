@@ -10,5 +10,8 @@
   },
   "dependencies": {
     "@graphql-tools/schema": "^7.1.5"
+  },
+  "scripts": {
+    "poc": "ts-node -T poc/execute.ts"
   }
 }

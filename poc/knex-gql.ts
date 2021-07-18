@@ -1,26 +1,19 @@
 import type { Knex } from 'knex'
 import {
-  MapperKind,
   IDirectiveResolvers,
   getDirectives,
-  mapSchema,
   getUserTypesFromSchema,
 } from '@graphql-tools/utils'
 import { makeExecutableSchema } from '@graphql-tools/schema'
-import {
-  printSchema,
-  graphql,
-  GraphQLType,
-  // isObjectType,
-  isListType,
-  isNonNullType,
-  GraphQLSchema,
-  GraphQLObjectType,
-} from 'graphql'
+import { printSchema, graphql, GraphQLSchema } from 'graphql'
+import * as findDirective from './directives/find'
+import * as tableDirective from './directives/table'
+import * as createDirective from './directives/create'
 
 interface KnexGqlOptions {
   knex: Knex
   typeDefs: string
+  directiveResolvers?: IDirectiveResolvers
 }
 
 export class KnexGql {
@@ -28,39 +21,27 @@ export class KnexGql {
   knex: Knex
   tableNameMap = new Map<string, string>()
 
-  constructor({ knex, typeDefs }: KnexGqlOptions) {
+  constructor({
+    knex,
+    typeDefs,
+    directiveResolvers: givenDirectiveResolvers,
+  }: KnexGqlOptions) {
     this.knex = knex
 
     const directiveResolvers: IDirectiveResolvers = {
-      stringReplace(next, _root, args) {
-        return next().then((name: string) => {
-          return name.replace(args['str'], args['with'])
-        })
-      },
-      find: (_next, _root, _args, _ctx, info) => {
-        const targetType = getRawType(info.returnType)
-        const tableName = this.tableNameMap.get(targetType.name)
-        return knex(tableName).first()
-      },
+      find: findDirective.factory(this),
+      ...givenDirectiveResolvers,
     }
 
-    // const collectTableName = (schema: GraphQLSchema) =>
-    //   mapSchema(schema, {
-    //     [MapperKind.OBJECT_TYPE]: (fieldConfig) => {
-    //       const directives = getDirectives(schema, fieldConfig)
-    //       const directiveArgumentMap = directives['table']
-    //       if (directiveArgumentMap) {
-    //         const { name } = directiveArgumentMap
-    //         this.tableNameMap.set(fieldConfig.name, name)
-    //       }
-    //       return fieldConfig
-    //     },
-    //   })
-
     this.schema = makeExecutableSchema({
-      typeDefs,
+      typeDefs: [
+        createDirective.definition,
+        tableDirective.definition,
+        findDirective.definition,
+        typeDefs,
+      ],
       directiveResolvers,
-      // schemaTransforms: [collectTableName],
+      schemaTransforms: [createDirective.factorySchemaTransformer(this)],
     })
 
     const types = getUserTypesFromSchema(this.schema)
@@ -72,10 +53,6 @@ export class KnexGql {
         this.tableNameMap.set(type.name, name)
       }
     })
-  }
-
-  getKnex() {
-    return this.knex
   }
 
   schemaToString() {
@@ -91,17 +68,4 @@ export class KnexGql {
       },
     })
   }
-}
-
-function getRawType(type?: GraphQLType): GraphQLObjectType {
-  if (!type) {
-    throw new Error()
-  }
-  if (isNonNullType(type)) {
-    return getRawType(type.ofType)
-  }
-  if (isListType(type)) {
-    return getRawType(type.ofType)
-  }
-  return type as GraphQLObjectType
 }
