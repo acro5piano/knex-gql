@@ -9,10 +9,22 @@ const typeDefs = gql`
   type User @table(name: "users") {
     id: ID!
     name: String! @stringReplace(str: "ka", with: "KA")
+    posts: [Post!]! @hasMany(foreignKey: "user_id")
   }
 
   input UserInput {
     name: String!
+  }
+
+  type Post @table(name: "posts") {
+    id: ID!
+    user_id: ID!
+    title: String!
+  }
+
+  input PostInput {
+    user_id: ID!
+    title: String!
   }
 
   type Query {
@@ -21,6 +33,7 @@ const typeDefs = gql`
 
   type Mutation {
     createUser(input: UserInput!): User! @create
+    createPost(input: PostInput!): Post! @create
   }
 `
 

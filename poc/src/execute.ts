@@ -1,7 +1,7 @@
 import { gql } from '../framework'
 import { knexGql } from './schema'
 
-async function main() {
+async function createSchema() {
   await knexGql.knex.raw(`
     DROP SCHEMA public CASCADE;
     CREATE SCHEMA public;
@@ -11,6 +11,17 @@ async function main() {
     t.uuid('id').primary().defaultTo(knexGql.knex.raw('uuid_generate_v4()'))
     t.string('name').notNullable()
   })
+  await knexGql.knex.schema.createTable('posts', (t) => {
+    t.uuid('id').primary().defaultTo(knexGql.knex.raw('uuid_generate_v4()'))
+    t.uuid('user_id').notNullable().references('users.id').onDelete('CASCADE')
+    t.string('title').notNullable()
+  })
+}
+
+const log = (a: any) => console.log(JSON.stringify(a, undefined, 2))
+
+async function main() {
+  await createSchema()
 
   const res = await knexGql.query(
     gql`
@@ -27,6 +38,24 @@ async function main() {
     `,
   )
 
+  const aliceId = res!.data!['alice']['id']
+
+  await knexGql.query(
+    gql`
+      mutation ($userId: ID!) {
+        createPost(input: { user_id: $userId, title: "Hello World!" }) {
+          id
+          title
+        }
+      }
+    `,
+    {
+      variables: {
+        userId: aliceId,
+      },
+    },
+  )
+
   await knexGql
     .query(
       gql`
@@ -34,34 +63,20 @@ async function main() {
           user(id: $id) {
             id
             name
+            posts {
+              id
+              title
+            }
           }
         }
       `,
       {
         variables: {
-          id: res!.data!['alice']['id'],
+          id: aliceId,
         },
       },
     )
-    .then(console.log)
-
-  await knexGql
-    .query(
-      gql`
-        query ($name: String) {
-          user(name: $name) {
-            id
-            name
-          }
-        }
-      `,
-      {
-        variables: {
-          name: 'alice',
-        },
-      },
-    )
-    .then(console.log)
+    .then(log)
 
   await knexGql.knex.destroy()
 }
