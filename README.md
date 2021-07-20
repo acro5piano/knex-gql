@@ -2,106 +2,14 @@
 
 [experimental] A GraphQL Query Builder using Knex.js
 
-# Spec
+# Why
 
-This is just README. No implementation. Just a concept.
+Creating a GraphQL service with a Relational Database is a hard thing. We should take care of:
 
-### Basic
+- Performance. N+1 problem will happen if you don't use Dataloader
+- Pagination. Dataloader pattern is hard to implement pagination without a hacky `union` or window functions.
+- Security. Keeping private fields needs much more work.
+- Code Reusability. GraphQL frameworks provides the Middleware function, but it is often not enough.
+- Realtime. Using GraphQL subscritpion is a challenging task.
 
-```typescript
-import { gql, createKnexGraphQL } from 'knex-graphql'
-import createKnex from 'knex'
-
-const knex = createKnex({
-  client: 'pg',
-  connection: 'postgres://postgres:postgres@127.0.0.1:5432/postgres',
-})
-
-const schema = gql`
-  type User {
-    id: ID!
-    name: String!
-  }
-  input UserInput {
-    name: String
-  }
-`
-
-const { query } = createKnexGraphQL({
-  knex,
-  schema,
-})
-
-async function mutate() {
-  await query(
-    gql`
-      mutation ($input: UserInput!) {
-        insertUser(object: $input) {
-          returning {
-            id
-            name
-          }
-        }
-      }
-    `,
-    {
-      variables: {
-        input: {
-          name: 'Kay',
-        },
-      },
-    },
-  )
-}
-
-async function query() {
-  return query(gql`
-    query {
-      users {
-        id
-        name
-      }
-    }
-  `)
-}
-
-async function main() {
-  await mutate()
-  const { data } = await query()
-  console.log(data)
-  // outputs:
-  //
-  // {
-  //   data: {
-  //     insertUser: {
-  //       returning: {
-  //         id: 1,
-  //         name: 'Kay',
-  //       },
-  //     }
-  //   }
-  // }
-}
-```
-
-### With HTTP layer
-
-In this example we use `fastify`, but anything can be here.
-
-```typescript
-import { GraphORM, gql } from '@graph-orm/core'
-import Fastify from 'fastify'
-
-const orm = new GraphORM({
-  connection: 'postgres://postgres:postgres@127.0.0.1:5432/postgres',
-})
-
-const app = Fastify()
-
-app.post('/graphql', (request, reply) => {
-  const { query, variables } = request.body
-  return orm.graphql(query, { variables })
-})
-
-app.listen(8080)
-```
+So, why not integrate Knex with GraphQL directly?

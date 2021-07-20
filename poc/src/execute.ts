@@ -1,5 +1,5 @@
+import { gql } from '../framework'
 import { knexGql } from './schema'
-import { gql } from './util'
 
 async function main() {
   await knexGql.knex.schema.createTable('users', (t) => {

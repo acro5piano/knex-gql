@@ -1,8 +1,8 @@
-import { gql } from './util'
 import { IDirectiveResolvers } from '@graphql-tools/utils'
-import { KnexGql } from './knex-gql'
 import createKnex from 'knex'
 import { knexLittleLogger } from 'knex-little-logger'
+
+import { KnexGql, gql } from '../framework'
 
 const knex = createKnex({
   client: 'sqlite3',

@@ -1,8 +1,8 @@
 import {
+  GraphQLObjectType,
   GraphQLType,
   isListType,
   isNonNullType,
-  GraphQLObjectType,
 } from 'graphql'
 
 export const gql = ([a]: TemplateStringsArray) => a!
