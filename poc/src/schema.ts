@@ -1,16 +1,7 @@
 import { IDirectiveResolvers } from '@graphql-tools/utils'
-import createKnex from 'knex'
-import { knexLittleLogger } from 'knex-little-logger'
 
 import { KnexGql, gql } from '../framework'
-
-const knex = createKnex({
-  client: 'sqlite3',
-  connection: ':memory:',
-  useNullAsDefault: true,
-})
-
-knexLittleLogger(knex)
+import { knex } from './knex'
 
 const typeDefs = gql`
   directive @stringReplace(str: String, with: String) on FIELD_DEFINITION
@@ -21,12 +12,11 @@ const typeDefs = gql`
   }
 
   input UserInput {
-    id: ID!
     name: String!
   }
 
   type Query {
-    user: User! @find
+    user(id: ID @eq): User @find
   }
 
   type Mutation {

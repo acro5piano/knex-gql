@@ -1,5 +1,11 @@
-import { CreateDirective } from './create'
-import { FindDirective } from './find'
-import { TableDirective } from './table'
+import { CreateDirective } from './CreateDirective'
+import { EqDirective } from './EqDirective'
+import { FindDirective } from './FindDirective'
+import { TableDirective } from './TableDirective'
 
-export const directives = [CreateDirective, FindDirective, TableDirective]
+export const directives = [
+  TableDirective,
+  CreateDirective,
+  EqDirective,
+  FindDirective,
+]

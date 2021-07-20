@@ -7,6 +7,7 @@ import { GraphQLSchema, graphql, printSchema } from 'graphql'
 import type { Knex } from 'knex'
 
 import { directives } from './directives'
+import { IExecutionOption } from './interfaces'
 
 interface KnexGqlOptions {
   knex: Knex
@@ -67,12 +68,13 @@ export class KnexGql {
     return printSchema(this.schema)
   }
 
-  query(source: string) {
+  query(source: string, options: IExecutionOption = {}) {
     return graphql({
       schema: this.schema,
       source,
+      variableValues: options.variables,
       contextValue: {
-        userId: '2967ad13-2f8e-4d98-b67a-e1f3b6560d0e',
+        userId: '2967ad13-2f8e-4d98-b67a-e1f3b6560d0e', // TODO
       },
     })
   }

@@ -1,9 +1,11 @@
 import {
   GraphQLObjectType,
   GraphQLType,
+  InputValueDefinitionNode,
   isListType,
   isNonNullType,
 } from 'graphql'
+import type { Knex } from 'knex'
 
 export const gql = ([a]: TemplateStringsArray) => a!
 
@@ -18,4 +20,22 @@ export function getRawType(type?: GraphQLType): GraphQLObjectType {
     return getRawType(type.ofType)
   }
   return type as GraphQLObjectType
+}
+
+export async function resolveFirst(p: Knex.QueryBuilder) {
+  return (await p)[0]
+}
+
+export function getArgumentValuesByDirectiveName(
+  directiveName: string,
+  args?: ReadonlyArray<InputValueDefinitionNode>,
+) {
+  if (!args) {
+    return []
+  }
+  return args.filter(
+    (arg) =>
+      arg.directives?.map((d) => d.name.value === directiveName).length ||
+      0 > 0,
+  )
 }

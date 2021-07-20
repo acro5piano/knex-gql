@@ -1,7 +1,7 @@
 import { MapperKind, getDirectives, mapSchema } from '@graphql-tools/utils'
 
 import { IDirective } from '../interfaces'
-import { gql } from '../util'
+import { getRawType, gql, resolveFirst } from '../util'
 
 export const CreateDirective: IDirective = {
   name: 'create',
@@ -15,12 +15,12 @@ export const CreateDirective: IDirective = {
           const directives = getDirectives(schema, fieldConfig)
           const directiveArgumentMap = directives['create']
           if (directiveArgumentMap) {
-            fieldConfig.resolve = async (_root, args) => {
-              await knexGql.knex('users').insert(args['input'])
-              return knexGql
-                .knex('users')
-                .where({ id: args['input']['id'] })
-                .first()
+            const typeName = getRawType(fieldConfig.type)
+            const tableName = knexGql.tableNameMap.get(typeName.name)
+            fieldConfig.resolve = (_root, args) => {
+              return resolveFirst(
+                knexGql.knex(tableName).insert(args['input']).returning('*'),
+              ) // TODO: filter keys based on node field set selection
             }
           }
           return fieldConfig

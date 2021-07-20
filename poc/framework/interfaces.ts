@@ -9,3 +9,7 @@ export interface IDirective {
   getDirectiveResolver?: (knexGql: KnexGql) => DirectiveResolverFn
   getSchemaTransformer?: (knexGql: KnexGql) => ExecutableSchemaTransformation
 }
+
+export interface IExecutionOption<V extends object = any> {
+  variables?: V
+}

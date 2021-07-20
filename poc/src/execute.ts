@@ -2,39 +2,46 @@ import { gql } from '../framework'
 import { knexGql } from './schema'
 
 async function main() {
+  await knexGql.knex.raw(`
+    DROP SCHEMA public CASCADE;
+    CREATE SCHEMA public;
+    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+  `)
   await knexGql.knex.schema.createTable('users', (t) => {
-    t.uuid('id').unique()
+    t.uuid('id').primary().defaultTo(knexGql.knex.raw('uuid_generate_v4()'))
     t.string('name').notNullable()
   })
 
-  await knexGql
-    .query(
-      gql`
-        mutation {
-          createUser(
-            input: {
-              id: "d30e4bd4-e143-43ba-aee5-967df1784bab"
-              name: "kazuya"
-            }
-          ) {
-            id
-            name
-          }
+  const res = await knexGql.query(
+    gql`
+      mutation {
+        bob: createUser(input: { name: "bob" }) {
+          id
+          name
         }
-      `,
-    )
-    .then(console.log)
+        alice: createUser(input: { name: "alice" }) {
+          id
+          name
+        }
+      }
+    `,
+  )
 
   await knexGql
     .query(
       gql`
-        query {
-          user {
+        query ($id: ID) {
+          user(id: $id) {
             id
             name
           }
         }
       `,
+      {
+        variables: {
+          id: res!.data!['alice']['id'],
+        },
+      },
     )
     .then(console.log)
 
