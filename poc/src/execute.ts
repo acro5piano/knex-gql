@@ -45,6 +45,24 @@ async function main() {
     )
     .then(console.log)
 
+  await knexGql
+    .query(
+      gql`
+        query ($name: String) {
+          user(name: $name) {
+            id
+            name
+          }
+        }
+      `,
+      {
+        variables: {
+          name: 'alice',
+        },
+      },
+    )
+    .then(console.log)
+
   await knexGql.knex.destroy()
 }
 

@@ -16,7 +16,7 @@ const typeDefs = gql`
   }
 
   type Query {
-    user(id: ID @eq): User @find
+    user(id: ID @eq, name: String @eq): User @find
   }
 
   type Mutation {
