@@ -10,7 +10,7 @@ Creating a GraphQL service with a Relational Database is a hard thing. We should
 - Pagination. Dataloader pattern is hard to implement pagination without a hacky `union` or window functions.
 - Security. Keeping private fields needs much more work.
 - Code Reusability. GraphQL frameworks provides the Middleware function, but it is often not enough.
-- Realtime. Using GraphQL subscritpion is a challenging task.
+- Realtime. Using GraphQL subscription is a challenging task.
 - Type Safety. How to type GraphQL result without relying on Codegen?
 
 So, why not integrate Knex with GraphQL directly?
