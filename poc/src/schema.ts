@@ -2,6 +2,8 @@ import { IDirectiveResolvers } from '@graphql-tools/utils'
 
 import { KnexGql, gql } from '../framework'
 import { knex } from './knex'
+import { LoginMutation } from './resolvers/LoginMutation'
+import { ViewerQuery } from './resolvers/ViewerQuery'
 
 const typeDefs = gql`
   directive @stringReplace(str: String, with: String) on FIELD_DEFINITION
@@ -30,6 +32,11 @@ const typeDefs = gql`
     title: String!
   }
 
+  type LoginPayload {
+    token: String!
+    user: User!
+  }
+
   type Query {
     user(
       id: ID @where(operator: "=")
@@ -39,11 +46,14 @@ const typeDefs = gql`
     allUsers: [User!]! @all
     users(name: String @where(operator: "ILIKE")): [User!]! @paginate(limit: 5)
     post(id: ID! @eq): Post @find
+    viewer: User @useResolver(resolver: "ViewerQuery")
   }
 
   type Mutation {
     createUser(input: UserInput!): User! @insert
     createPost(input: PostInput!): Post! @insert
+    login(userId: ID!, password: String!): LoginPayload!
+      @useResolver(resolver: "LoginMutation")
   }
 `
 
@@ -60,4 +70,8 @@ export const knexGql = new KnexGql({
   typeDefs,
   directiveResolvers,
   errorHandler: console.error,
+  fieldResolvers: [
+    LoginMutation,
+    ViewerQuery as any, // TODO
+  ],
 })

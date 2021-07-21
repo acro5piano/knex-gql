@@ -8,7 +8,12 @@ import type { Knex } from 'knex'
 
 import { directives } from './directives'
 import { BatchLoader } from './execution/BatchLoader'
-import { IExecutionOption } from './interfaces'
+import type {
+  IContext,
+  ICustomFieldResolver,
+  ICustomResoverFn,
+  IExecutionOption,
+} from './interfaces'
 
 type ErrorHandler = (errors: ReadonlyArray<GraphQLError>) => any
 
@@ -17,12 +22,14 @@ interface KnexGqlOptions {
   typeDefs: string
   directiveResolvers?: IDirectiveResolvers
   errorHandler?: ErrorHandler
+  fieldResolvers?: ICustomFieldResolver[]
 }
 
 export class KnexGql {
   schema: GraphQLSchema
   knex: Knex
   tableNameMap = new Map<string, string>()
+  resolverMap = new Map<string, ICustomResoverFn<any, IContext, any>>()
   errorHandler?: ErrorHandler
 
   constructor({
@@ -30,9 +37,14 @@ export class KnexGql {
     typeDefs,
     directiveResolvers: givenDirectiveResolvers,
     errorHandler,
+    fieldResolvers = [],
   }: KnexGqlOptions) {
     this.knex = knex
     this.errorHandler = errorHandler
+
+    fieldResolvers.forEach((resolver) => {
+      this.resolverMap.set(resolver.name, resolver.resolve)
+    })
 
     const presetsDirectiveTypeDefs = directives.map(
       (directive) => directive.definition,
@@ -82,7 +94,7 @@ export class KnexGql {
       variableValues: options.variables,
       contextValue: {
         batchLoader: new BatchLoader(this),
-        userId: '2967ad13-2f8e-4d98-b67a-e1f3b6560d0e', // TODO
+        ...(options.context || {}),
       },
     })
     if (result.errors && this.errorHandler) {

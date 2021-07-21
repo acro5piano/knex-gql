@@ -7,6 +7,7 @@ import { HasManyDirective } from './HasManyDirective'
 import { InsertDirective } from './InsertDirective'
 import { PaginateDirective } from './PaginateDirective'
 import { TableDirective } from './TableDirective'
+import { UseResolverDirective } from './UseResolverDirective'
 import { WhereDirective } from './WhereDirective'
 
 export const directives = [
@@ -21,4 +22,5 @@ export const directives = [
   HasManyDirective,
   WhereDirective,
   PaginateDirective,
+  UseResolverDirective,
 ]

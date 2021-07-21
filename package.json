@@ -4,9 +4,11 @@
     "pgcli": "pgcli postgres://postgres:postgres@127.0.0.1:11155/postgres"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^8.5.4",
     "@types/node": "^16.3.3",
     "graphql": "^15.5.1",
     "import-sort-style-module": "^6.0.0",
+    "jsonwebtoken": "^8.5.1",
     "knex": "^0.95.7",
     "knex-little-logger": "^0.0.2",
     "pg": "^8.6.0",
