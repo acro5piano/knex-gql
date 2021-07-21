@@ -68,7 +68,7 @@ const typeDefs = fs.readFileSync('./schema.gql')
 
 const knexGql = new KnexGql({ knex, typeDefs })
 
-knexGql.query(gql`
+await knexGql.query(gql`
   mutation CreateUser {
     createUser(input: { name: "Kay" }) {
       id
@@ -76,6 +76,34 @@ knexGql.query(gql`
     }
   }
 `).then(console.log)
+
+// {
+//   data: {
+//     createUser: {
+//       id: 'f8f37213-060b-4b6d-843c-5fc498bcbc08',
+//       name: 'Kay'
+//     }
+//   }
+// }
+
+await knexGql.query(gql`
+  query GetUser {
+    user(name: "Kay") {
+      id
+      name
+    }
+  }
+`).then(console.log)
+
+// {
+//   data: {
+//     user: {
+//       id: 'f8f37213-060b-4b6d-843c-5fc498bcbc08',
+//       name: 'Kay'
+//     }
+//   }
+// }
+
 
 ```
 
