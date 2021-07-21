@@ -7,7 +7,7 @@ import {
 } from 'graphql'
 import type { Knex } from 'knex'
 
-export const gql = ([a]: TemplateStringsArray) => a!
+export const gql = String.raw
 
 export function getRawType(type?: GraphQLType): GraphQLObjectType {
   if (!type) {

@@ -11,6 +11,13 @@ async function main() {
     name: 'Kay',
   })
 
+  const UserFragment = gql`
+    fragment UserFragment on User {
+      id
+      name
+    }
+  `
+
   await knexGql
     .query(
       gql`
@@ -33,11 +40,11 @@ async function main() {
           login(userId: $userId, password: "_fake") {
             token
             user {
-              id
-              name
+              ...UserFragment
             }
           }
         }
+        ${UserFragment}
       `,
       {
         variables: {
@@ -52,10 +59,10 @@ async function main() {
       gql`
         query {
           viewer {
-            id
-            name
+            ...UserFragment
           }
         }
+        ${UserFragment}
       `,
       {
         variables: {
