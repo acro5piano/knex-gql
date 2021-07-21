@@ -35,6 +35,7 @@ const typeDefs = gql`
     ): User @first
     firstUser: User @first
     allUsers: [User!]! @all
+    users(name: String @where(operator: "ILIKE")): [User!]! @paginate(limit: 5)
     post(id: ID! @eq): Post @find
   }
 

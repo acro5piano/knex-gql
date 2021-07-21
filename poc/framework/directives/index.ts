@@ -5,6 +5,7 @@ import { FindDirective } from './FindDirective'
 import { FirstDirective } from './FirstDirective'
 import { HasManyDirective } from './HasManyDirective'
 import { InsertDirective } from './InsertDirective'
+import { PaginateDirective } from './PaginateDirective'
 import { TableDirective } from './TableDirective'
 import { WhereDirective } from './WhereDirective'
 
@@ -19,4 +20,5 @@ export const directives = [
   FirstDirective,
   HasManyDirective,
   WhereDirective,
+  PaginateDirective,
 ]

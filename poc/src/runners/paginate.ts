@@ -10,26 +10,34 @@ async function main() {
   await knex('users').insert(users)
   await knex('posts').insert(posts)
 
-  // await knexGql
-  //   .query(
-  //     gql`
-  //       query {
-  //         users {
-  //           id
-  //           name
-  //         }
-  //       }
-  //     `,
-  //   )
-  //   .then(log)
+  await knexGql
+    .query(
+      gql`
+        query {
+          users(name: "Joh%") {
+            id
+            name
+            posts {
+              id
+              title
+            }
+          }
+        }
+      `,
+    )
+    .then(log)
 
   await knexGql
     .query(
       gql`
         query {
-          user(name: "Joh%") {
+          users(name: "%jam%", page: 2) {
             id
             name
+            posts {
+              id
+              title
+            }
           }
         }
       `,
