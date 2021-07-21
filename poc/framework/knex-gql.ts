@@ -7,6 +7,7 @@ import { GraphQLSchema, graphql, printSchema } from 'graphql'
 import type { Knex } from 'knex'
 
 import { directives } from './directives'
+import { BatchLoader } from './execution/BatchLoader'
 import { IExecutionOption } from './interfaces'
 
 interface KnexGqlOptions {
@@ -74,6 +75,7 @@ export class KnexGql {
       source,
       variableValues: options.variables,
       contextValue: {
+        batchLoader: new BatchLoader(this),
         userId: '2967ad13-2f8e-4d98-b67a-e1f3b6560d0e', // TODO
       },
     })

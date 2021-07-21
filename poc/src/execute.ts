@@ -56,6 +56,23 @@ async function main() {
     },
   )
 
+  await knexGql
+    .query(
+      gql`
+        query {
+          allUsers {
+            id
+            name
+            posts {
+              id
+              title
+            }
+          }
+        }
+      `,
+    )
+    .then(log)
+
   await knexGql.query(
     gql`
       query ($id: ID) {
@@ -75,23 +92,6 @@ async function main() {
       },
     },
   )
-
-  await knexGql
-    .query(
-      gql`
-        query {
-          allUsers {
-            id
-            name
-            posts {
-              id
-              title
-            }
-          }
-        }
-      `,
-    )
-    .then(log)
 
   await knexGql.knex.destroy()
 }
