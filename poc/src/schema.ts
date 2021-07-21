@@ -29,6 +29,7 @@ const typeDefs = gql`
 
   type Query {
     user(id: ID @eq, name: String @eq): User @find
+    allUsers: [User!]! @all
   }
 
   type Mutation {

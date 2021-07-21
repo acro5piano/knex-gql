@@ -56,11 +56,31 @@ async function main() {
     },
   )
 
+  await knexGql.query(
+    gql`
+      query ($id: ID) {
+        user(id: $id) {
+          id
+          name
+          posts {
+            id
+            title
+          }
+        }
+      }
+    `,
+    {
+      variables: {
+        id: aliceId,
+      },
+    },
+  )
+
   await knexGql
     .query(
       gql`
-        query ($id: ID) {
-          user(id: $id) {
+        query {
+          allUsers {
             id
             name
             posts {
@@ -70,11 +90,6 @@ async function main() {
           }
         }
       `,
-      {
-        variables: {
-          id: aliceId,
-        },
-      },
     )
     .then(log)
 
