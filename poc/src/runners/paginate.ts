@@ -10,14 +10,44 @@ async function main() {
   await knex('users').insert(users)
   await knex('posts').insert(posts)
 
+  await knexGql.query(
+    gql`
+      query {
+        users(name: "Joh%") {
+          id
+          name
+          posts {
+            id
+            title
+          }
+        }
+      }
+    `,
+  )
+
+  await knexGql.query(
+    gql`
+      query {
+        users(name: "%jam%", page: 2) {
+          id
+          name
+          posts {
+            id
+            title
+          }
+        }
+      }
+    `,
+  )
+
   await knexGql
     .query(
       gql`
         query {
-          users(name: "Joh%") {
+          users(name: "%Bi%") {
             id
             name
-            posts {
+            pageinatedPosts(page: 1) {
               id
               title
             }
@@ -31,10 +61,10 @@ async function main() {
     .query(
       gql`
         query {
-          users(name: "%jam%", page: 2) {
+          users(name: "%Bi%") {
             id
             name
-            posts {
+            pageinatedPosts(page: 2) {
               id
               title
             }

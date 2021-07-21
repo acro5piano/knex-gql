@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "r": "ts-node -T"
+    "r": "ts-node -T",
+    "pgcli": "pgcli postgres://postgres:postgres@127.0.0.1:11155/postgres"
   },
   "devDependencies": {
     "@types/node": "^16.3.3",

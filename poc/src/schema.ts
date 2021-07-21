@@ -10,6 +10,8 @@ const typeDefs = gql`
     id: ID!
     name: String! @stringReplace(str: "ka", with: "KA")
     posts: [Post!]! @hasMany(foreignKey: "user_id")
+    pageinatedPosts: [Post!]!
+      @hasMany(foreignKey: "user_id", type: PAGINATOR, limit: 7)
   }
 
   input UserInput {
