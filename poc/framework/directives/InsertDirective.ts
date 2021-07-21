@@ -11,7 +11,7 @@ export const InsertDirective: IDirective = {
   getSchemaTransformer: (knexGql) => {
     return function insertDirective(schema) {
       return mapSchema(schema, {
-        [MapperKind.OBJECT_FIELD]: (fieldConfig) => {
+        [MapperKind.MUTATION_ROOT_FIELD]: (fieldConfig) => {
           const directives = getDirectives(schema, fieldConfig)
           const directiveArgumentMap = directives['insert']
           if (directiveArgumentMap) {

@@ -52,4 +52,9 @@ const directiveResolvers: IDirectiveResolvers = {
   },
 }
 
-export const knexGql = new KnexGql({ knex, typeDefs, directiveResolvers })
+export const knexGql = new KnexGql({
+  knex,
+  typeDefs,
+  directiveResolvers,
+  errorHandler: console.error,
+})

@@ -12,7 +12,7 @@ export const FirstDirective: IDirective = {
   getSchemaTransformer: (knexGql) => {
     return function findDirective(schema) {
       return mapSchema(schema, {
-        [MapperKind.OBJECT_FIELD]: (fieldConfig) => {
+        [MapperKind.QUERY_ROOT_FIELD]: (fieldConfig) => {
           const directives = getDirectives(schema, fieldConfig)
           const directiveArgumentMap = directives['first']
           if (directiveArgumentMap) {

@@ -3,30 +3,36 @@ import {
   makeExecutableSchema,
 } from '@graphql-tools/schema'
 import { IDirectiveResolvers } from '@graphql-tools/utils'
-import { GraphQLSchema, graphql, printSchema } from 'graphql'
+import { GraphQLError, GraphQLSchema, graphql, printSchema } from 'graphql'
 import type { Knex } from 'knex'
 
 import { directives } from './directives'
 import { BatchLoader } from './execution/BatchLoader'
 import { IExecutionOption } from './interfaces'
 
+type ErrorHandler = (errors: ReadonlyArray<GraphQLError>) => any
+
 interface KnexGqlOptions {
   knex: Knex
   typeDefs: string
   directiveResolvers?: IDirectiveResolvers
+  errorHandler?: ErrorHandler
 }
 
 export class KnexGql {
   schema: GraphQLSchema
   knex: Knex
   tableNameMap = new Map<string, string>()
+  errorHandler?: ErrorHandler
 
   constructor({
     knex,
     typeDefs,
     directiveResolvers: givenDirectiveResolvers,
+    errorHandler,
   }: KnexGqlOptions) {
     this.knex = knex
+    this.errorHandler = errorHandler
 
     const presetsDirectiveTypeDefs = directives.map(
       (directive) => directive.definition,
@@ -69,8 +75,8 @@ export class KnexGql {
     return printSchema(this.schema)
   }
 
-  query(source: string, options: IExecutionOption = {}) {
-    return graphql({
+  async query(source: string, options: IExecutionOption = {}) {
+    const result = await graphql({
       schema: this.schema,
       source,
       variableValues: options.variables,
@@ -79,5 +85,9 @@ export class KnexGql {
         userId: '2967ad13-2f8e-4d98-b67a-e1f3b6560d0e', // TODO
       },
     })
+    if (result.errors && this.errorHandler) {
+      this.errorHandler(result.errors)
+    }
+    return result
   }
 }
