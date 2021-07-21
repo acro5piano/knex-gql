@@ -1,4 +1,5 @@
 import { AllDirective } from './AllDirective'
+import { BelongsToDirective } from './BelongsToDirective'
 import { CreateDirective } from './CreateDirective'
 import { EqDirective } from './EqDirective'
 import { FindDirective } from './FindDirective'
@@ -9,6 +10,7 @@ export const directives = [
   TableDirective,
 
   AllDirective,
+  BelongsToDirective,
   CreateDirective,
   EqDirective,
   FindDirective,

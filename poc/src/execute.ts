@@ -23,7 +23,7 @@ const log = (a: any) => console.log(JSON.stringify(a, undefined, 2))
 async function main() {
   await createSchema()
 
-  const res = await knexGql.query(
+  const userRes = await knexGql.query(
     gql`
       mutation {
         bob: createUser(input: { name: "bob" }) {
@@ -38,9 +38,9 @@ async function main() {
     `,
   )
 
-  const aliceId = res!.data!['alice']['id']
+  const aliceId = userRes!.data!['alice']['id']
 
-  await knexGql.query(
+  const postRes = await knexGql.query(
     gql`
       mutation ($userId: ID!) {
         createPost(input: { user_id: $userId, title: "Hello World!" }) {
@@ -55,6 +55,8 @@ async function main() {
       },
     },
   )
+
+  const postId = postRes!.data!['createPost']['id']
 
   await knexGql
     .query(
@@ -92,6 +94,28 @@ async function main() {
       },
     },
   )
+
+  await knexGql
+    .query(
+      gql`
+        query ($id: ID!) {
+          post(id: $id) {
+            id
+            title
+            user {
+              id
+              name
+            }
+          }
+        }
+      `,
+      {
+        variables: {
+          id: postId,
+        },
+      },
+    )
+    .then(log)
 
   await knexGql.knex.destroy()
 }

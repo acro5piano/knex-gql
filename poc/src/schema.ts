@@ -20,6 +20,7 @@ const typeDefs = gql`
     id: ID!
     user_id: ID!
     title: String!
+    user: User! @belongsTo(foreignKey: "user_id")
   }
 
   input PostInput {
@@ -30,6 +31,7 @@ const typeDefs = gql`
   type Query {
     user(id: ID @eq, name: String @eq): User @find
     allUsers: [User!]! @all
+    post(id: ID! @eq): Post @find
   }
 
   type Mutation {
