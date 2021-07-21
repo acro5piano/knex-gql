@@ -74,6 +74,19 @@ async function main() {
     )
     .then(log)
 
+  await knexGql
+    .query(
+      gql`
+        query {
+          firstUser {
+            id
+            name
+          }
+        }
+      `,
+    )
+    .then(log)
+
   await knexGql.knex.destroy()
 }
 
