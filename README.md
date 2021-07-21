@@ -19,6 +19,8 @@ So, why not integrate Knex with GraphQL directly?
 
 ## tl;dr
 
+First, define your schema with preset directives:
+
 ```graphql
 # Schema.gql
 
@@ -63,6 +65,8 @@ type Mutation {
 }
 ```
 
+Then, query!
+
 ```typescript
 const typeDefs = fs.readFileSync('./schema.gql')
 
@@ -76,7 +80,6 @@ await knexGql.query(gql`
     }
   }
 `).then(console.log)
-
 // {
 //   data: {
 //     createUser: {
@@ -94,7 +97,6 @@ await knexGql.query(gql`
     }
   }
 `).then(console.log)
-
 // {
 //   data: {
 //     user: {
@@ -109,14 +111,14 @@ await knexGql.query(gql`
 
 ## Directives
 
-| name        | description                           |
-| ----------- | ------------------------------------- |
-| all         | Get all matching records              |
-| belongsTo   | Get the parent record of given type   |
-| first       | Get the first matching record         |
-| hasMany     | Get child records with pagination     |
-| insert      | Insert a record into the type's table |
-| paginate    | Paginate matching records             |
-| table       | Map table and type                    |
-| useResolver | Declare to use a custom resolver      |
-| where       | Add `where` clause for current query  |
+| name         | description                           |
+| ------------ | ------------------------------------- |
+| @all         | Get all matching records              |
+| @belongsTo   | Get the parent record of given type   |
+| @first       | Get the first matching record         |
+| @hasMany     | Get child records with pagination     |
+| @insert      | Insert a record into the type's table |
+| @paginate    | Paginate matching records             |
+| @table       | Map table and type                    |
+| @useResolver | Declare to use a custom resolver      |
+| @where       | Add `where` clause for current query  |
