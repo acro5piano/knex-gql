@@ -30,14 +30,12 @@ export const FirstDirective = createFieldManipulator({
       whereArgs.forEach((where) => {
         const value = args[where.name.value]
         if (value) {
-          const operator = (
-            where.directives?.[0]?.arguments?.[0]?.value as
-              | StringValueNode
-              | undefined
-          )?.value
-          if (!operator) {
-            throw new Error('operator is not defined')
-          }
+          const operator =
+            (
+              where.directives?.[0]?.arguments?.[0]?.value as
+                | StringValueNode
+                | undefined
+            )?.value || '='
           query.where(where.name.value, operator, value)
         }
       })

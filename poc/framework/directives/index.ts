@@ -1,7 +1,5 @@
 import { AllDirective } from './AllDirective'
 import { BelongsToDirective } from './BelongsToDirective'
-import { EqDirective } from './EqDirective'
-import { FindDirective } from './FindDirective'
 import { FirstDirective } from './FirstDirective'
 import { HasManyDirective } from './HasManyDirective'
 import { InsertDirective } from './InsertDirective'
@@ -16,8 +14,6 @@ export const directives = [
   AllDirective,
   BelongsToDirective,
   InsertDirective,
-  EqDirective,
-  FindDirective,
   FirstDirective,
   HasManyDirective,
   WhereDirective,
