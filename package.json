@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "poc": "ts-node -T poc/src/execute.ts"
+    "r": "ts-node -T"
   },
   "devDependencies": {
     "@types/node": "^16.3.3",

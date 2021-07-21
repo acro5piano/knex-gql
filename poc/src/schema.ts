@@ -29,7 +29,11 @@ const typeDefs = gql`
   }
 
   type Query {
-    user(id: ID @eq, name: String @eq): User @find
+    user(
+      id: ID @where(operator: "=")
+      name: String @where(operator: "LIKE")
+    ): User @first
+    firstUser: User @first
     allUsers: [User!]! @all
     post(id: ID! @eq): Post @find
   }

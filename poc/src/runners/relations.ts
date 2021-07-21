@@ -1,27 +1,10 @@
-import { gql } from '../framework'
-import { knexGql } from './schema'
-
-async function createSchema() {
-  await knexGql.knex.raw(`
-    DROP SCHEMA public CASCADE;
-    CREATE SCHEMA public;
-    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-  `)
-  await knexGql.knex.schema.createTable('users', (t) => {
-    t.uuid('id').primary().defaultTo(knexGql.knex.raw('uuid_generate_v4()'))
-    t.string('name').notNullable()
-  })
-  await knexGql.knex.schema.createTable('posts', (t) => {
-    t.uuid('id').primary().defaultTo(knexGql.knex.raw('uuid_generate_v4()'))
-    t.uuid('user_id').notNullable().references('users.id').onDelete('CASCADE')
-    t.string('title').notNullable()
-  })
-}
-
-const log = (a: any) => console.log(JSON.stringify(a, undefined, 2))
+import { gql } from '../../framework'
+import { init } from '../knex'
+import { knexGql } from '../schema'
+import { log } from '../util'
 
 async function main() {
-  await createSchema()
+  await init()
 
   const userRes = await knexGql.query(
     gql`
@@ -95,27 +78,25 @@ async function main() {
     },
   )
 
-  await knexGql
-    .query(
-      gql`
-        query ($id: ID!) {
-          post(id: $id) {
+  await knexGql.query(
+    gql`
+      query ($id: ID!) {
+        post(id: $id) {
+          id
+          title
+          user {
             id
-            title
-            user {
-              id
-              name
-            }
+            name
           }
         }
-      `,
-      {
-        variables: {
-          id: postId,
-        },
+      }
+    `,
+    {
+      variables: {
+        id: postId,
       },
-    )
-    .then(log)
+    },
+  )
 
   await knexGql.knex.destroy()
 }
