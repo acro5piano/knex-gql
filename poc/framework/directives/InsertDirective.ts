@@ -3,17 +3,17 @@ import { MapperKind, getDirectives, mapSchema } from '@graphql-tools/utils'
 import { IDirective } from '../interfaces'
 import { getRawType, gql, resolveFirst } from '../util'
 
-export const CreateDirective: IDirective = {
-  name: 'create',
+export const InsertDirective: IDirective = {
+  name: 'insert',
   definition: gql`
-    directive @create on FIELD_DEFINITION
+    directive @insert on FIELD_DEFINITION
   `,
   getSchemaTransformer: (knexGql) => {
-    return function createDirective(schema) {
+    return function insertDirective(schema) {
       return mapSchema(schema, {
         [MapperKind.OBJECT_FIELD]: (fieldConfig) => {
           const directives = getDirectives(schema, fieldConfig)
-          const directiveArgumentMap = directives['create']
+          const directiveArgumentMap = directives['insert']
           if (directiveArgumentMap) {
             const typeName = getRawType(fieldConfig.type)
             const tableName = knexGql.tableNameMap.get(typeName.name)

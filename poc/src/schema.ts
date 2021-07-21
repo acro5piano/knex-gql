@@ -35,8 +35,8 @@ const typeDefs = gql`
   }
 
   type Mutation {
-    createUser(input: UserInput!): User! @create
-    createPost(input: PostInput!): Post! @create
+    createUser(input: UserInput!): User! @insert
+    createPost(input: PostInput!): Post! @insert
   }
 `
 
