@@ -1,6 +1,6 @@
 # knex-graphql
 
-[experimental] A GraphQL Query Builder using Knex.js
+[experimental] A Schema First GraphQL Query Builder for Knex.js
 
 # Why
 
@@ -17,21 +17,78 @@ So, why not integrate Knex with GraphQL directly?
 
 # POC
 
+## tl;dr
+
 ```graphql
+# Schema.gql
+
 type User @table(name: "users") {
   id: ID!
   name: String!
+  posts: [Post!]! @hasMany(foreignKey: "user_id")
+  pageinatedPosts: [Post!]!
+    @hasMany(foreignKey: "user_id", type: PAGINATOR, limit: 7)
 }
 
 input UserInput {
   name: String!
 }
 
+type Post @table(name: "posts") {
+  id: ID!
+  user_id: ID!
+  title: String!
+  user: User! @belongsTo(foreignKey: "user_id")
+}
+
+input PostInput {
+  user_id: ID!
+  title: String!
+}
+
+type LoginPayload {
+  token: String!
+  user: User!
+}
+
 type Query {
-  user(id: ID! @eq): User! @find
+  user(
+    id: ID @where(operator: "=")
+    name: String @where(operator: "LIKE")
+  ): User @first
 }
 
 type Mutation {
-  createUser(input: UserInput!): User! @create
+  createUser(input: UserInput!): User! @insert
 }
 ```
+
+```typescript
+const typeDefs = fs.readFileSync('./schema.gql')
+
+const knexGql = new KnexGql({ knex, typeDefs })
+
+knexGql.query(gql`
+  mutation CreateUser {
+    createUser(input: { name: "Kay" }) {
+      id
+      name
+    }
+  }
+`).then(console.log)
+
+```
+
+## Directives
+
+| name        | description                           |
+| ----------- | ------------------------------------- |
+| all         | Get all matching records              |
+| belongsTo   | Get the parent record of given type   |
+| first       | Get the first matching record         |
+| hasMany     | Get child records with pagination     |
+| insert      | Insert a record into the type's table |
+| paginate    | Paginate matching records             |
+| table       | Map table and type                    |
+| useResolver | Declare to use a custom resolver      |
+| where       | Add `where` clause for current query  |
