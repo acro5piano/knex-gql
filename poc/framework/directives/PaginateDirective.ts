@@ -1,8 +1,9 @@
 import { MapperKind, getDirectives, mapSchema } from '@graphql-tools/utils'
-import { GraphQLInt, StringValueNode } from 'graphql'
+import { GraphQLInt } from 'graphql'
 
+import { getKnexQuery } from '../execution/getKnexQuery'
 import { IDirective } from '../interfaces'
-import { getArgumentValuesByDirectiveName, getRawType, gql } from '../util'
+import { getRawType, gql } from '../util'
 
 export const PaginateDirective: IDirective = {
   name: 'paginate',
@@ -20,10 +21,6 @@ export const PaginateDirective: IDirective = {
             const typeName = getRawType(fieldConfig.type)
             const tableName = knexGql.tableNameMap.get(typeName.name)
             const originalResolve = fieldConfig.resolve
-            const whereArgs = getArgumentValuesByDirectiveName(
-              'where',
-              fieldConfig.astNode?.arguments,
-            )
             if (!fieldConfig.args) {
               fieldConfig.args = {}
             }
@@ -33,28 +30,14 @@ export const PaginateDirective: IDirective = {
             }
             fieldConfig.resolve = (root, args, ctx, info) => {
               const offset = (args['page'] - 1) * limit
-              // nextValue should be a knex instance
               const nextValue = originalResolve?.(root, args, ctx, info)
-              if (nextValue) {
-                return nextValue.limit(limit).offset(offset)
-              }
-              const query = knexGql.knex(tableName)
-              // TODO: In the near future, we should combine data fetching logic
-              // like @eq and @where, as we would like to add @whereIn and @whereNot and so on.
-              whereArgs.forEach((where) => {
-                const value = args[where.name.value]
-                if (value) {
-                  const operator = (
-                    where.directives?.[0]?.arguments?.[0]?.value as
-                      | StringValueNode
-                      | undefined
-                  )?.value
-                  if (!operator) {
-                    throw new Error('operator is not defined')
-                  }
-                  query.where(where.name.value, operator, value)
-                }
-              })
+              const query = getKnexQuery(
+                fieldConfig,
+                knexGql,
+                tableName!,
+                nextValue,
+                args,
+              )
               return query.limit(limit).offset(offset)
             }
           }

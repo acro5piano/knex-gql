@@ -1,7 +1,6 @@
-import { StringValueNode } from 'graphql'
-
+import { getKnexQuery } from '../execution/getKnexQuery'
 import { createFieldManipulator } from '../schema/directive/createFieldManipulator'
-import { getArgumentValuesByDirectiveName, gql } from '../util'
+import { gql } from '../util'
 
 export const FirstDirective = createFieldManipulator({
   name: 'first',
@@ -14,31 +13,19 @@ export const FirstDirective = createFieldManipulator({
     fieldConfig,
     knexGql,
   }) => {
-    const whereArgs = getArgumentValuesByDirectiveName(
-      'where',
-      fieldConfig.astNode?.arguments,
-    )
     fieldConfig.resolve = (root, args, ctx, info) => {
       // nextValue should be a knex instance
       const nextValue = originalResolve?.(root, args, ctx, info)
       if (nextValue) {
         return nextValue.first()
       }
-      const query = knexGql.knex(targetTableName)
-      // TODO: In the near future, we should combine data fetching logic
-      // like @eq and @where, as we would like to add @whereIn and @whereNot and so on.
-      whereArgs.forEach((where) => {
-        const value = args[where.name.value]
-        if (value) {
-          const operator =
-            (
-              where.directives?.[0]?.arguments?.[0]?.value as
-                | StringValueNode
-                | undefined
-            )?.value || '='
-          query.where(where.name.value, operator, value)
-        }
-      })
+      const query = getKnexQuery(
+        fieldConfig,
+        knexGql,
+        targetTableName!,
+        nextValue,
+        args,
+      )
       return query.first()
     }
     return fieldConfig

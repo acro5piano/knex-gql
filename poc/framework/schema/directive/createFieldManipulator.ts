@@ -23,7 +23,6 @@ interface CreateFieldManipulatorOption {
   name: string
   definition: string
   schemaMapper: SchemaMapper
-  kind?: MapperKind
 }
 
 export function createFieldManipulator(
