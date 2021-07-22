@@ -17,6 +17,8 @@ So, why not integrate Knex with GraphQL directly?
 
 # POC
 
+For more details, please see Sample app. https://github.com/acro5piano/knex-gql-sample-app
+
 ## tl;dr
 
 First, define your schema with preset directives:
