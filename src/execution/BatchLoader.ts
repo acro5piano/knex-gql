@@ -10,17 +10,30 @@ type Page = {
   offset: number
 }
 
+interface GetLoaderProps {
+  type: LoaderType
+  targetTable: string
+  foreignKey?: string
+  page?: Page
+  queryModifier?: (query: Knex.QueryBuilder) => void
+}
+
+interface CreateLoaderProps extends GetLoaderProps {
+  knex: Knex
+}
+
 export class BatchLoader {
   private loaderMap = new Map<string, Dataloader<any, any>>()
 
   constructor(private knexGql: KnexGql) {}
 
-  getLoader(
-    type: LoaderType,
-    targetTable: string,
+  getLoader({
+    type,
+    targetTable,
     foreignKey = 'id',
-    page?: Page,
-  ) {
+    page,
+    queryModifier,
+  }: GetLoaderProps) {
     const key = `${type}:${targetTable}:${foreignKey}:${
       page ? `${page.limit}:${page.offset}` : ''
     }`
@@ -28,52 +41,58 @@ export class BatchLoader {
     if (maybeLoader) {
       return maybeLoader
     }
-    const loader = createLoader(
+    const loader = createLoader({
       type,
       targetTable,
       foreignKey,
-      this.knexGql.knex,
+      knex: this.knexGql.knex,
       page,
-    )
+      queryModifier,
+    })
     this.loaderMap.set(key, loader)
     return loader
   }
 }
 
-function createLoader(
-  type: LoaderType,
-  targetTable: string,
-  foreignKey: string,
-  knex: Knex,
-  page?: Page,
-) {
+function createLoader({
+  type,
+  targetTable,
+  foreignKey = 'id',
+  page,
+  knex,
+  queryModifier,
+}: CreateLoaderProps) {
   switch (type) {
     case 'hasMany':
       if (page) {
-        return new Dataloader((ids: readonly string[]) =>
-          knex(
+        return new Dataloader((ids: readonly string[]) => {
+          const query = knex(
             knex(targetTable)
               .select('*')
               .rowNumber('relation_index', 'id', foreignKey) // TODO: make order by enable
               .whereIn(foreignKey, ids)
               .as('_t'),
+          ).whereBetween(knex.ref('relation_index') as any, [
+            page.offset,
+            page.offset + page.limit,
+          ])
+          if (queryModifier) {
+            queryModifier(query)
+          }
+          return query.then((rows) =>
+            ids.map((id) => rows.filter((row) => row[foreignKey] === id)),
           )
-            .whereBetween(knex.ref('relation_index') as any, [
-              page.offset,
-              page.offset + page.limit,
-            ])
-            .then((rows) =>
-              ids.map((id) => rows.filter((row) => row[foreignKey] === id)),
-            ),
-        )
+        })
       } else {
-        return new Dataloader((ids: readonly string[]) =>
-          knex(targetTable)
-            .whereIn(foreignKey, ids)
-            .then((rows) =>
-              ids.map((id) => rows.filter((row) => row[foreignKey] === id)),
-            ),
-        )
+        return new Dataloader((ids: readonly string[]) => {
+          const query = knex(targetTable).whereIn(foreignKey, ids)
+          if (queryModifier) {
+            queryModifier(query)
+          }
+          return query.then((rows) =>
+            ids.map((id) => rows.filter((row) => row[foreignKey] === id)),
+          )
+        })
       }
     case 'belongsTo':
       return new Dataloader((ids: readonly string[]) =>

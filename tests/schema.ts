@@ -11,8 +11,9 @@ const typeDefs = gql`
     createdAt: DateTime!
     createdOn: String! @dateFormat(format: "YYYY-MM-DD")
     createdOnDayOfWeek: String! @dateFormat(format: "ddd")
-    posts: [Post!]! @hasMany(foreignKey: "userId")
-    pageinatedPosts: [Post!]!
+    posts(title: String @where(operator: "LIKE")): [Post!]!
+      @hasMany(foreignKey: "userId")
+    pageinatedPosts(title: String @where(operator: "LIKE")): [Post!]!
       @hasMany(foreignKey: "userId", type: PAGINATOR, limit: 7)
   }
 

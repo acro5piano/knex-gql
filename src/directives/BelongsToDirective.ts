@@ -19,7 +19,7 @@ export const BelongsToDirective: IDirective = {
             const tableName = knexGql.tableNameMap.get(typeName.name)
             fieldConfig.resolve = (root, _args, ctx: IContext) => {
               return ctx.batchLoader
-                .getLoader('belongsTo', tableName!)
+                .getLoader({ type: 'belongsTo', targetTable: tableName! })
                 .load(root[directiveArgumentMap['foreignKey']])
             }
           }

@@ -1,8 +1,9 @@
-import type { GraphQLFieldConfig, StringValueNode } from 'graphql'
+import type { GraphQLFieldConfig } from 'graphql'
 import { Knex } from 'knex'
 
 import type { KnexGql } from '../knex-gql'
 import { getArgumentValuesByDirectiveName } from '../util'
+import { applyWhereToQuery } from './applyWhereToQuery'
 
 function isKnexQuery(val: any): val is Knex.QueryBuilder {
   return val && 'then' in val && 'from' in val && 'select' in val
@@ -25,18 +26,6 @@ export function getKnexQuery(
     fieldConfig.astNode?.arguments,
   )
   const query = knexGql.knex(tableName)
-  whereArgs.forEach((where) => {
-    const value = args[where.name.value]
-    if (value) {
-      const operator =
-        (
-          where.directives?.[0]?.arguments?.[0]?.value as
-            | StringValueNode
-            | undefined
-        )?.value || '='
-      query.where(where.name.value, operator, value)
-    }
-  })
-
+  applyWhereToQuery(query, whereArgs, args)
   return query
 }
