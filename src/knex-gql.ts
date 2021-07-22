@@ -10,17 +10,19 @@ import { directives } from './directives'
 import { BatchLoader } from './execution/BatchLoader'
 import type {
   IContext,
+  ICustomFieldDirective,
   ICustomFieldResolver,
   ICustomResoverFn,
   IExecutionOption,
 } from './interfaces'
+import { defaultSchema, resolveFunctions } from './schema'
 
 type ErrorHandler = (errors: ReadonlyArray<GraphQLError>) => any
 
 interface KnexGqlOptions {
   knex: Knex
   typeDefs: string
-  directiveResolvers?: IDirectiveResolvers
+  directiveResolvers?: ICustomFieldDirective[]
   errorHandler?: ErrorHandler
   fieldResolvers?: ICustomFieldResolver[]
 }
@@ -35,7 +37,7 @@ export class KnexGql {
   constructor({
     knex,
     typeDefs,
-    directiveResolvers: givenDirectiveResolvers,
+    directiveResolvers: givenDirectiveResolvers = [],
     errorHandler,
     fieldResolvers = [],
   }: KnexGqlOptions) {
@@ -48,6 +50,20 @@ export class KnexGql {
 
     const presetsDirectiveTypeDefs = directives.map(
       (directive) => directive.definition,
+    )
+
+    const customDirectiveTypeDefs = givenDirectiveResolvers.map(
+      (directive) => directive.definition,
+    )
+
+    const customDirectiveResolvers = givenDirectiveResolvers.reduce(
+      (resolvers, directive) => {
+        return {
+          ...resolvers,
+          [directive.name]: directive.resolve,
+        }
+      },
+      {} as IDirectiveResolvers,
     )
 
     const presetsDirectiveResolvers = directives.reduce(
@@ -74,12 +90,18 @@ export class KnexGql {
     )
 
     this.schema = makeExecutableSchema({
-      typeDefs: [...presetsDirectiveTypeDefs, typeDefs],
+      typeDefs: [
+        defaultSchema,
+        ...presetsDirectiveTypeDefs,
+        ...customDirectiveTypeDefs,
+        typeDefs,
+      ],
       directiveResolvers: {
         ...presetsDirectiveResolvers,
-        ...givenDirectiveResolvers,
+        ...customDirectiveResolvers,
       },
       schemaTransforms: [...presetsSchemaTransforms],
+      resolvers: resolveFunctions,
     })
   }
 

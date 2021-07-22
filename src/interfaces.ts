@@ -36,3 +36,9 @@ export interface ICustomFieldResolver<
   name: string
   resolve: ICustomResoverFn<T, Ctx, Args>
 }
+
+export interface ICustomFieldDirective {
+  name: string
+  definition: string
+  resolve: DirectiveResolverFn<any, IContext>
+}

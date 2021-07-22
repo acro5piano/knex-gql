@@ -22,10 +22,12 @@ export async function init() {
   await knex.schema.createTable('users', (t) => {
     t.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'))
     t.string('name').notNullable()
+    t.timestamps(true, true)
   })
   await knex.schema.createTable('posts', (t) => {
     t.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'))
     t.uuid('user_id').notNullable().references('users.id').onDelete('CASCADE')
     t.string('title').notNullable()
+    t.timestamps(true, true)
   })
 }

@@ -1,16 +1,16 @@
-import { IDirectiveResolvers } from '@graphql-tools/utils'
-
 import { KnexGql, gql } from '../src'
+import { DateFormatDirective } from './directives/DateFormatDirective'
 import { knex } from './knex'
 import { LoginMutation } from './resolvers/LoginMutation'
 import { ViewerQuery } from './resolvers/ViewerQuery'
 
 const typeDefs = gql`
-  directive @stringReplace(str: String, with: String) on FIELD_DEFINITION
-
   type User @table(name: "users") {
     id: ID!
-    name: String! @stringReplace(str: "ka", with: "KA")
+    name: String!
+    createdAt: DateTime!
+    createdOn: String! @dateFormat(format: "YYYY-MM-DD")
+    createdOnDayOfWeek: String! @dateFormat(format: "ddd")
     posts: [Post!]! @hasMany(foreignKey: "userId")
     pageinatedPosts: [Post!]!
       @hasMany(foreignKey: "userId", type: PAGINATOR, limit: 7)
@@ -57,18 +57,10 @@ const typeDefs = gql`
   }
 `
 
-const directiveResolvers: IDirectiveResolvers = {
-  stringReplace(next, _root, args) {
-    return next().then((name: string) => {
-      return name.replace(args['str'], args['with'])
-    })
-  },
-}
-
 export const knexGql = new KnexGql({
   knex,
   typeDefs,
-  directiveResolvers,
+  directiveResolvers: [DateFormatDirective],
   fieldResolvers: [
     LoginMutation,
     ViewerQuery as any, // TODO
