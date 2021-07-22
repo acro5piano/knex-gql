@@ -16,6 +16,7 @@ import type {
   IExecutionOption,
 } from './interfaces'
 import { defaultSchema, resolveFunctions } from './schema'
+import { TypeScriptSchemaGetter } from './typegen'
 
 type ErrorHandler = (errors: ReadonlyArray<GraphQLError>) => any
 
@@ -93,6 +94,10 @@ export class KnexGql {
 
   schemaToString() {
     return printSchema(this.schema)
+  }
+
+  schemaToTypeScriptSchema() {
+    return new TypeScriptSchemaGetter(this.schema).getCode()
   }
 
   async query(source: string, options: IExecutionOption = {}) {
