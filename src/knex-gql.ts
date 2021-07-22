@@ -1,3 +1,5 @@
+import fs from 'fs/promises'
+
 import {
   ExecutableSchemaTransformation,
   makeExecutableSchema,
@@ -26,6 +28,8 @@ interface KnexGqlOptions {
   directiveResolvers?: ICustomFieldDirective[]
   errorHandler?: ErrorHandler
   fieldResolvers?: ICustomFieldResolver[]
+  emitSchema?: boolean | string
+  emitTypeScriptDefs?: boolean | string
 }
 
 export class KnexGql {
@@ -41,6 +45,8 @@ export class KnexGql {
     directiveResolvers: givenDirectiveResolvers = [],
     errorHandler,
     fieldResolvers = [],
+    emitSchema = false,
+    emitTypeScriptDefs = false,
   }: KnexGqlOptions) {
     this.knex = knex
     this.errorHandler = errorHandler
@@ -90,6 +96,17 @@ export class KnexGql {
       schemaTransforms: [...presetsSchemaTransforms],
       resolvers: resolveFunctions,
     })
+
+    if (emitSchema !== false) {
+      const fileName = emitSchema === true ? 'schema.gql' : emitSchema
+      fs.writeFile(fileName, this.schemaToString(), 'utf8')
+    }
+
+    if (emitTypeScriptDefs !== false) {
+      const fileName =
+        emitTypeScriptDefs === true ? 'schema.ts' : emitTypeScriptDefs
+      fs.writeFile(fileName, this.schemaToTypeScriptSchema(), 'utf8')
+    }
   }
 
   schemaToString() {

@@ -1,0 +1,75 @@
+directive @table(name: String!) on OBJECT
+
+directive @all on FIELD_DEFINITION
+
+directive @belongsTo(foreignKey: String!) on FIELD_DEFINITION
+
+directive @insert on FIELD_DEFINITION
+
+directive @first on FIELD_DEFINITION
+
+directive @hasMany(foreignKey: String!, type: HasManyType = SIMPLE, limit: Int = 20) on FIELD_DEFINITION
+
+directive @where(operator: String = "=") on ARGUMENT_DEFINITION
+
+directive @paginate(limit: Int = 20) on FIELD_DEFINITION
+
+directive @useResolver(resolver: String!) on FIELD_DEFINITION
+
+directive @dateFormat(format: String = "YYYY-MM-DD") on FIELD_DEFINITION
+
+"""
+A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
+"""
+scalar DateTime
+
+enum HasManyType {
+  PAGINATOR
+  SIMPLE
+}
+
+type User {
+  id: ID!
+  name: String!
+  createdAt: DateTime!
+  createdOn: String!
+  createdOnDayOfWeek: String!
+  posts(title: String): [Post!]!
+  pageinatedPosts(title: String, page: Int = 1): [Post!]!
+}
+
+input UserInput {
+  name: String!
+}
+
+type Post {
+  id: ID!
+  userId: ID!
+  title: String!
+  user: User!
+}
+
+input PostInput {
+  user_id: ID!
+  title: String!
+}
+
+type LoginPayload {
+  token: String!
+  user: User!
+}
+
+type Query {
+  user(id: ID, name: String): User
+  firstUser: User
+  allUsers: [User!]!
+  users(name: String, page: Int = 1): [User!]!
+  post(id: ID!): Post
+  viewer: User
+}
+
+type Mutation {
+  createUser(input: UserInput!): User!
+  createPost(input: PostInput!): Post!
+  login(userId: ID!, password: String!): LoginPayload!
+}

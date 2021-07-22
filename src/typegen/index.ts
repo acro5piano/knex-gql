@@ -11,6 +11,8 @@ export class TypeScriptSchemaGetter {
   code = `/* eslint-disable */
 import { GraphQLResolveInfo } from 'graphql';
 
+export interface IKnexGqlContext {}
+
 export type ResolverFn<TResult, TParent, TContext, TArgs> = (
   parent: TParent,
   args: TArgs,
@@ -38,8 +40,12 @@ export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
       if (!node) {
         return ''
       }
-      if (node.kind === 'ObjectTypeDefinition') {
-        return code + '\n\n' + this.objectTypeToTS(node)
+      if (
+        node.kind === 'ObjectTypeDefinition' ||
+        node.kind === 'InputObjectTypeDefinition'
+      ) {
+        // TODO: object and input are almost same
+        return code + '\n\n' + this.objectTypeToTS(node as any)
       }
       return code
     }, '')

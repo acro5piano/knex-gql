@@ -1,3 +1,5 @@
+import path from 'path'
+
 import { KnexGql, gql } from '../src'
 import { DateFormatDirective } from './directives/DateFormatDirective'
 import { knexWithLog } from './knex'
@@ -66,4 +68,6 @@ export const knexGql = new KnexGql({
     LoginMutation,
     ViewerQuery as any, // TODO
   ],
+  emitSchema: path.resolve(__dirname, '__generated__/schema.gql'),
+  emitTypeScriptDefs: path.resolve(__dirname, '__generated__/schema.ts'),
 })
