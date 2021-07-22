@@ -1,4 +1,4 @@
-import type { IContext, ICustomFieldResolver } from '../../framework'
+import type { IContext, ICustomFieldResolver } from '../../src'
 import { knex } from '../knex'
 
 interface Context extends IContext {
