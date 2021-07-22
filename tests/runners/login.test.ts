@@ -1,10 +1,13 @@
-import { gql } from '../../framework'
-import { init, knex } from '../knex'
-import { knexGql } from '../schema'
-import { log } from '../util'
+import test from 'ava'
+import MockDate from 'mockdate'
 
-async function main() {
-  await init()
+import { gql } from '../../src'
+import { knex } from '../knex'
+import { knexGql } from '../schema'
+
+test('login', async (t) => {
+  MockDate.set('2021-07-22T07:53:43.585Z')
+
   const userId = '625c6433-d903-4e40-9c29-7d0faa3a9ecb'
   await knex('users').insert({
     id: userId,
@@ -31,7 +34,7 @@ async function main() {
         }
       `,
     )
-    .then(log)
+    .then(t.snapshot)
 
   await knexGql
     .query(
@@ -52,7 +55,7 @@ async function main() {
         },
       },
     )
-    .then(log)
+    .then(t.snapshot)
 
   await knexGql
     .query(
@@ -73,9 +76,5 @@ async function main() {
         },
       },
     )
-    .then(log)
-
-  await knexGql.knex.destroy()
-}
-
-main()
+    .then(t.snapshot)
+})

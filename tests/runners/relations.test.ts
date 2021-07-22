@@ -1,11 +1,10 @@
-import { gql } from '../../framework'
-import { init } from '../knex'
+import test from 'ava'
+
+import { gql } from '../../src'
 import { knexGql } from '../schema'
-import { log } from '../util'
+import { omitIdDeep } from '../util'
 
-async function main() {
-  await init()
-
+test('relations', async (t) => {
   const userRes = await knexGql.query(
     gql`
       mutation {
@@ -20,6 +19,8 @@ async function main() {
       }
     `,
   )
+
+  t.snapshot(omitIdDeep(userRes))
 
   const aliceId = userRes!.data!['alice']['id']
 
@@ -39,6 +40,8 @@ async function main() {
     },
   )
 
+  t.snapshot(omitIdDeep(postRes))
+
   const postId = postRes!.data!['createPost']['id']
 
   await knexGql
@@ -56,49 +59,52 @@ async function main() {
         }
       `,
     )
-    .then(log)
+    .then(omitIdDeep)
+    .then(t.snapshot)
 
-  await knexGql.query(
-    gql`
-      query ($id: ID) {
-        user(id: $id) {
-          id
-          name
-          posts {
-            id
-            title
-          }
-        }
-      }
-    `,
-    {
-      variables: {
-        id: aliceId,
-      },
-    },
-  )
-
-  await knexGql.query(
-    gql`
-      query ($id: ID!) {
-        post(id: $id) {
-          id
-          title
-          user {
+  await knexGql
+    .query(
+      gql`
+        query ($id: ID) {
+          user(id: $id) {
             id
             name
+            posts {
+              id
+              title
+            }
           }
         }
-      }
-    `,
-    {
-      variables: {
-        id: postId,
+      `,
+      {
+        variables: {
+          id: aliceId,
+        },
       },
-    },
-  )
+    )
+    .then(omitIdDeep)
+    .then(t.snapshot)
 
-  await knexGql.knex.destroy()
-}
-
-main()
+  await knexGql
+    .query(
+      gql`
+        query ($id: ID!) {
+          post(id: $id) {
+            id
+            title
+            user {
+              id
+              name
+            }
+          }
+        }
+      `,
+      {
+        variables: {
+          id: postId,
+        },
+      },
+    )
+    .then(omitIdDeep)
+    .then(t.snapshot)
+})

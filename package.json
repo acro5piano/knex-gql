@@ -1,19 +1,25 @@
 {
   "scripts": {
     "r": "ts-node -T",
-    "pgcli": "pgcli postgres://postgres:postgres@127.0.0.1:11155/postgres"
+    "pgcli": "pgcli postgres://postgres:postgres@127.0.0.1:11155/postgres",
+    "test": "ava --serial"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^8.5.4",
     "@types/node": "^16.3.3",
+    "@types/uuid": "^8.3.1",
+    "ava": "^3.15.0",
     "graphql": "^15.5.1",
     "import-sort-style-module": "^6.0.0",
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.95.7",
     "knex-little-logger": "^0.0.2",
+    "knex-stringcase": "^1.4.5",
+    "mockdate": "^3.0.5",
     "pg": "^8.6.0",
     "prettier": "^2.3.2",
     "prettier-plugin-import-sort": "^0.0.7",
+    "remeda": "^0.0.29",
     "sqlite3": "^5.0.2",
     "ts-node": "^10.1.0",
     "typescript": "^4.3.5"

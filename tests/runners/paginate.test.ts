@@ -1,44 +1,47 @@
-import { gql } from '../../framework'
-import { posts, users } from '../fixtures'
-import { init, knex } from '../knex'
+import test from 'ava'
+
+import { gql } from '../../src'
+import { posts, users } from '../fixtures.json'
+import { knex } from '../knex'
 import { knexGql } from '../schema'
-import { log } from '../util'
 
-async function main() {
-  await init()
-
+test('paginate', async (t) => {
   await knex('users').insert(users)
   await knex('posts').insert(posts)
 
-  await knexGql.query(
-    gql`
-      query {
-        users(name: "Joh%") {
-          id
-          name
-          posts {
+  await knexGql
+    .query(
+      gql`
+        query {
+          users(name: "Joh%") {
             id
-            title
+            name
+            posts {
+              id
+              title
+            }
           }
         }
-      }
-    `,
-  )
+      `,
+    )
+    .then(t.snapshot)
 
-  await knexGql.query(
-    gql`
-      query {
-        users(name: "%jam%", page: 2) {
-          id
-          name
-          posts {
+  await knexGql
+    .query(
+      gql`
+        query {
+          users(name: "%jam%", page: 2) {
             id
-            title
+            name
+            posts {
+              id
+              title
+            }
           }
         }
-      }
-    `,
-  )
+      `,
+    )
+    .then(t.snapshot)
 
   await knexGql
     .query(
@@ -55,7 +58,7 @@ async function main() {
         }
       `,
     )
-    .then(log)
+    .then(t.snapshot)
 
   await knexGql
     .query(
@@ -72,7 +75,7 @@ async function main() {
         }
       `,
     )
-    .then(log)
+    .then(t.snapshot)
 
   await knexGql
     .query(
@@ -85,9 +88,5 @@ async function main() {
         }
       `,
     )
-    .then(log)
-
-  await knexGql.knex.destroy()
-}
-
-main()
+    .then(t.snapshot)
+})

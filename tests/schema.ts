@@ -1,6 +1,6 @@
 import { IDirectiveResolvers } from '@graphql-tools/utils'
 
-import { KnexGql, gql } from '../framework'
+import { KnexGql, gql } from '../src'
 import { knex } from './knex'
 import { LoginMutation } from './resolvers/LoginMutation'
 import { ViewerQuery } from './resolvers/ViewerQuery'
@@ -11,9 +11,9 @@ const typeDefs = gql`
   type User @table(name: "users") {
     id: ID!
     name: String! @stringReplace(str: "ka", with: "KA")
-    posts: [Post!]! @hasMany(foreignKey: "user_id")
+    posts: [Post!]! @hasMany(foreignKey: "userId")
     pageinatedPosts: [Post!]!
-      @hasMany(foreignKey: "user_id", type: PAGINATOR, limit: 7)
+      @hasMany(foreignKey: "userId", type: PAGINATOR, limit: 7)
   }
 
   input UserInput {
@@ -22,9 +22,9 @@ const typeDefs = gql`
 
   type Post @table(name: "posts") {
     id: ID!
-    user_id: ID!
+    userId: ID!
     title: String!
-    user: User! @belongsTo(foreignKey: "user_id")
+    user: User! @belongsTo(foreignKey: "userId")
   }
 
   input PostInput {
@@ -69,7 +69,6 @@ export const knexGql = new KnexGql({
   knex,
   typeDefs,
   directiveResolvers,
-  errorHandler: console.error,
   fieldResolvers: [
     LoginMutation,
     ViewerQuery as any, // TODO
