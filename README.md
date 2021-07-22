@@ -1,4 +1,4 @@
-# knex-graphql
+# knex-gql
 
 [experimental] A Schema First GraphQL Query Builder for Knex.js
 
