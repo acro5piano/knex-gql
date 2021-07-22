@@ -16,9 +16,6 @@ export const FirstDirective = createFieldManipulator({
     fieldConfig.resolve = (root, args, ctx, info) => {
       // nextValue should be a knex instance
       const nextValue = originalResolve?.(root, args, ctx, info)
-      if (nextValue) {
-        return nextValue.first()
-      }
       const query = getKnexQuery(
         fieldConfig,
         knexGql,

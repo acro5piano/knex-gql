@@ -6,8 +6,8 @@
 
 Creating a GraphQL service with a Relational Database is a hard thing. We should take care of:
 
-- Performance. N+1 problem will happen if you don't use Dataloader
-- Pagination. Dataloader pattern is hard to implement pagination without a hacky `union` or window functions.
+- Performance. N+1 problem will happen if you don't use Dataloader.
+- Pagination. [Dataloader pattern is hard to implement pagination](https://github.com/graphql/dataloader/issues/231) without a hacky `union` or window functions.
 - Security. Keeping private fields needs much more work.
 - Code Reusability. GraphQL frameworks provides the Middleware function, but it is often not enough.
 - Realtime. Using GraphQL subscription is a challenging task.
@@ -41,16 +41,6 @@ type Post @table(name: "posts") {
   user_id: ID!
   title: String!
   user: User! @belongsTo(foreignKey: "user_id")
-}
-
-input PostInput {
-  user_id: ID!
-  title: String!
-}
-
-type LoginPayload {
-  token: String!
-  user: User!
 }
 
 type Query {
