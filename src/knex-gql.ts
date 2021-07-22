@@ -66,19 +66,6 @@ export class KnexGql {
       {} as IDirectiveResolvers,
     )
 
-    const presetsDirectiveResolvers = directives.reduce(
-      (resolvers, directive) => {
-        if (directive.getDirectiveResolver) {
-          return {
-            ...resolvers,
-            [directive.name]: directive.getDirectiveResolver(this),
-          }
-        }
-        return resolvers
-      },
-      {} as IDirectiveResolvers,
-    )
-
     const presetsSchemaTransforms = directives.reduce(
       (transformers, directive) => {
         if (directive.getSchemaTransformer) {
@@ -97,7 +84,6 @@ export class KnexGql {
         typeDefs,
       ],
       directiveResolvers: {
-        ...presetsDirectiveResolvers,
         ...customDirectiveResolvers,
       },
       schemaTransforms: [...presetsSchemaTransforms],

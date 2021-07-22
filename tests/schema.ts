@@ -1,6 +1,6 @@
 import { KnexGql, gql } from '../src'
 import { DateFormatDirective } from './directives/DateFormatDirective'
-import { knex } from './knex'
+import { knexWithLog } from './knex'
 import { LoginMutation } from './resolvers/LoginMutation'
 import { ViewerQuery } from './resolvers/ViewerQuery'
 
@@ -59,7 +59,7 @@ const typeDefs = gql`
 `
 
 export const knexGql = new KnexGql({
-  knex,
+  knex: knexWithLog,
   typeDefs,
   directiveResolvers: [DateFormatDirective],
   fieldResolvers: [

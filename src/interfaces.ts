@@ -11,9 +11,6 @@ export interface IContext {
 export interface IDirective {
   name: string
   definition: string
-  getDirectiveResolver?: (
-    knexGql: KnexGql,
-  ) => DirectiveResolverFn<any, IContext>
   getSchemaTransformer?: (knexGql: KnexGql) => ExecutableSchemaTransformation
 }
 
