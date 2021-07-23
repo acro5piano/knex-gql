@@ -5,7 +5,7 @@ import type { GraphQLResolveInfo } from 'graphql'
 import type { BatchLoader } from './execution/BatchLoader'
 import type { KnexGql } from './knex-gql'
 
-export interface IContext {
+export interface KnexGqlContext {
   batchLoader: BatchLoader
 }
 
@@ -22,13 +22,13 @@ export interface IExecutionOption<V extends object = any> {
 
 export type ICustomResoverFn<
   T extends object,
-  Ctx extends IContext,
+  Ctx extends KnexGqlContext,
   Args extends object,
 > = IFieldResolver<T, Ctx, Args>
 
 export interface ICustomFieldResolver<
   T extends object = any,
-  Ctx extends IContext = IContext,
+  Ctx extends KnexGqlContext = KnexGqlContext,
   Args extends object = any,
 > {
   name: string
@@ -51,7 +51,7 @@ export type IDirectiveResolverFn<
 export interface ICustomFieldDirective<T> {
   name: string
   definition: string
-  resolve: IDirectiveResolverFn<any, any, IContext, T>
+  resolve: IDirectiveResolverFn<any, any, KnexGqlContext, T>
 }
 
 export type ISimplePagenatorArgs = {

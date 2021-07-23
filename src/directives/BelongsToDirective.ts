@@ -1,6 +1,6 @@
 import { BelongsToDirectiveArgs } from '../__generated__/schema'
 import { filterGraphQLSelections } from '../execution/filterSelection'
-import { IContext } from '../interfaces'
+import { KnexGqlContext } from '../interfaces'
 import { createFieldManipulator } from '../schema/directive/createFieldManipulator'
 import { gql } from '../util'
 
@@ -16,7 +16,7 @@ export const BelongsToDirective =
       directiveArgumentMap,
       targetTableName,
     }) => {
-      fieldConfig.resolve = (root, _args, ctx: IContext, info) => {
+      fieldConfig.resolve = (root, _args, ctx: KnexGqlContext, info) => {
         const columns = filterGraphQLSelections({
           info,
           knexGql,

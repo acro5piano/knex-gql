@@ -16,11 +16,11 @@ import { DatabaseTableInfo, getColumnInfo } from './database/columnInfo'
 import { directives } from './directives'
 import { BatchLoader } from './execution/BatchLoader'
 import type {
-  IContext,
   ICustomFieldDirective,
   ICustomFieldResolver,
   ICustomResoverFn,
   IExecutionOption,
+  KnexGqlContext,
 } from './interfaces'
 import { defaultSchema, resolveFunctions } from './schema/defaultSchema'
 import { TypeScriptSchemaGetter } from './typegen'
@@ -44,7 +44,7 @@ export class KnexGql {
   knex: Knex
   tableNameMap = new Map<string, string>()
   tableColumnsMap = new Map<string, DatabaseTableInfo>()
-  resolverMap = new Map<string, ICustomResoverFn<any, IContext, any>>()
+  resolverMap = new Map<string, ICustomResoverFn<any, KnexGqlContext, any>>()
   errorHandler?: ErrorHandler
 
   constructor({

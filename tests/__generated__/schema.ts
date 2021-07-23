@@ -1,7 +1,6 @@
 /* eslint-disable */
 import { GraphQLResolveInfo } from 'graphql';
-
-export interface IKnexGqlContext {}
+import { KnexGqlContext } from 'knex-gql'
 
 export type ResolverFn<TResult, TParent, TContext, TArgs> = (
   parent: TParent,
@@ -145,51 +144,51 @@ export interface MutationLoginArgs {
 
 
 export type UserResolvers = {
-  id: ResolverFn<string, User, IKnexGqlContext, {}>
-  name: ResolverFn<string, User, IKnexGqlContext, {}>
-  hashedName: ResolverFn<string, User, IKnexGqlContext, {}>
-  createdAt: ResolverFn<string, User, IKnexGqlContext, {}>
-  createdOn: ResolverFn<string, User, IKnexGqlContext, {}>
-  createdOnDayOfWeek: ResolverFn<string, User, IKnexGqlContext, {}>
-  posts: ResolverFn<Post[], User, IKnexGqlContext, UserPostsArgs>
-  pageinatedPosts: ResolverFn<Post[], User, IKnexGqlContext, UserPageinatedPostsArgs>
+  id: ResolverFn<string, User, KnexGqlContext, {}>
+  name: ResolverFn<string, User, KnexGqlContext, {}>
+  hashedName: ResolverFn<string, User, KnexGqlContext, {}>
+  createdAt: ResolverFn<string, User, KnexGqlContext, {}>
+  createdOn: ResolverFn<string, User, KnexGqlContext, {}>
+  createdOnDayOfWeek: ResolverFn<string, User, KnexGqlContext, {}>
+  posts: ResolverFn<Post[], User, KnexGqlContext, UserPostsArgs>
+  pageinatedPosts: ResolverFn<Post[], User, KnexGqlContext, UserPageinatedPostsArgs>
 }
 
 export type UserInputResolvers = {
-  name: ResolverFn<string, UserInput, IKnexGqlContext, {}>
+  name: ResolverFn<string, UserInput, KnexGqlContext, {}>
 }
 
 export type PostResolvers = {
-  id: ResolverFn<string, Post, IKnexGqlContext, {}>
-  userId: ResolverFn<string, Post, IKnexGqlContext, {}>
-  title: ResolverFn<string, Post, IKnexGqlContext, {}>
-  user: ResolverFn<User, Post, IKnexGqlContext, {}>
+  id: ResolverFn<string, Post, KnexGqlContext, {}>
+  userId: ResolverFn<string, Post, KnexGqlContext, {}>
+  title: ResolverFn<string, Post, KnexGqlContext, {}>
+  user: ResolverFn<User, Post, KnexGqlContext, {}>
 }
 
 export type PostInputResolvers = {
-  user_id: ResolverFn<string, PostInput, IKnexGqlContext, {}>
-  title: ResolverFn<string, PostInput, IKnexGqlContext, {}>
+  user_id: ResolverFn<string, PostInput, KnexGqlContext, {}>
+  title: ResolverFn<string, PostInput, KnexGqlContext, {}>
 }
 
 export type LoginPayloadResolvers = {
-  token: ResolverFn<string, LoginPayload, IKnexGqlContext, {}>
-  user: ResolverFn<User, LoginPayload, IKnexGqlContext, {}>
+  token: ResolverFn<string, LoginPayload, KnexGqlContext, {}>
+  user: ResolverFn<User, LoginPayload, KnexGqlContext, {}>
 }
 
 export type QueryResolvers = {
-  user?: ResolverFn<User| undefined | null, Query, IKnexGqlContext, QueryUserArgs>
-  firstUser?: ResolverFn<User| undefined | null, Query, IKnexGqlContext, {}>
-  allUsers: ResolverFn<User[], Query, IKnexGqlContext, {}>
-  users: ResolverFn<User[], Query, IKnexGqlContext, QueryUsersArgs>
-  userSearch: ResolverFn<User[], Query, IKnexGqlContext, QueryUserSearchArgs>
-  post?: ResolverFn<Post| undefined | null, Query, IKnexGqlContext, QueryPostArgs>
-  viewer?: ResolverFn<User| undefined | null, Query, IKnexGqlContext, {}>
+  user?: ResolverFn<User| undefined | null, Query, KnexGqlContext, QueryUserArgs>
+  firstUser?: ResolverFn<User| undefined | null, Query, KnexGqlContext, {}>
+  allUsers: ResolverFn<User[], Query, KnexGqlContext, {}>
+  users: ResolverFn<User[], Query, KnexGqlContext, QueryUsersArgs>
+  userSearch: ResolverFn<User[], Query, KnexGqlContext, QueryUserSearchArgs>
+  post?: ResolverFn<Post| undefined | null, Query, KnexGqlContext, QueryPostArgs>
+  viewer?: ResolverFn<User| undefined | null, Query, KnexGqlContext, {}>
 }
 
 export type MutationResolvers = {
-  createUser: ResolverFn<User, Mutation, IKnexGqlContext, MutationCreateUserArgs>
-  createPost: ResolverFn<Post, Mutation, IKnexGqlContext, MutationCreatePostArgs>
-  login: ResolverFn<LoginPayload, Mutation, IKnexGqlContext, MutationLoginArgs>
+  createUser: ResolverFn<User, Mutation, KnexGqlContext, MutationCreateUserArgs>
+  createPost: ResolverFn<Post, Mutation, KnexGqlContext, MutationCreatePostArgs>
+  login: ResolverFn<LoginPayload, Mutation, KnexGqlContext, MutationLoginArgs>
 }
 
 export interface Resolvers {

@@ -12,8 +12,8 @@ interface AppContext {
   userId?: string
 }
 
-declare module './__generated__/schema' {
-  interface IKnexGqlContext extends AppContext {}
+declare module 'knex-gql' {
+  interface KnexGqlContext extends AppContext {}
 }
 
 const typeDefs = gql`

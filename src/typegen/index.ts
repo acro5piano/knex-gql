@@ -12,8 +12,7 @@ import {
 export class TypeScriptSchemaGetter {
   code = `/* eslint-disable */
 import { GraphQLResolveInfo } from 'graphql';
-
-export interface IKnexGqlContext {}
+import { KnexGqlContext } from 'knex-gql'
 
 export type ResolverFn<TResult, TParent, TContext, TArgs> = (
   parent: TParent,
@@ -146,7 +145,7 @@ export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
         '\n' +
         `  ${field.name.value}${mark}: ResolverFn<${this.leafToTs(field.type)}${
           mark === '?' ? '| undefined | null' : ''
-        }, ${parentName}, IKnexGqlContext, ${args ? args : '{}'}>`
+        }, ${parentName}, KnexGqlContext, ${args ? args : '{}'}>`
       )
     }, '')
   }

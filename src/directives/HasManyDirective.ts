@@ -3,7 +3,7 @@ import { GraphQLInt } from 'graphql'
 import { HasManyDirectiveArgs } from '../__generated__/schema'
 import { applyWhereToQuery } from '../execution/applyWhereToQuery'
 import { filterGraphQLSelections } from '../execution/filterSelection'
-import { IContext } from '../interfaces'
+import { KnexGqlContext } from '../interfaces'
 import { createFieldManipulator } from '../schema/directive/createFieldManipulator'
 import { getArgumentValuesByDirectiveName, gql } from '../util'
 
@@ -35,7 +35,7 @@ export const HasManyDirective = createFieldManipulator<HasManyDirectiveArgs>({
     const limit = directiveArgumentMap.limit || DEFAULT_LIMIT
     switch (directiveArgumentMap.type) {
       case 'SIMPLE':
-        fieldConfig.resolve = (root, args, ctx: IContext, info) => {
+        fieldConfig.resolve = (root, args, ctx: KnexGqlContext, info) => {
           return ctx.batchLoader
             .getLoader({
               type: 'hasMany',
@@ -63,7 +63,7 @@ export const HasManyDirective = createFieldManipulator<HasManyDirectiveArgs>({
           type: GraphQLInt,
           defaultValue: 1,
         }
-        fieldConfig.resolve = (root, args, ctx: IContext, info) => {
+        fieldConfig.resolve = (root, args, ctx: KnexGqlContext, info) => {
           const offset = (args['page'] - 1) * limit
           return ctx.batchLoader
             .getLoader({
