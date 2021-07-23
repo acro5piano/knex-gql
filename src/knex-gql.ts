@@ -37,6 +37,7 @@ export class KnexGql {
   schema: GraphQLSchema
   knex: Knex
   tableNameMap = new Map<string, string>()
+  tableColumnsMap = new Map<string, string[]>()
   resolverMap = new Map<string, ICustomResoverFn<any, IContext, any>>()
   errorHandler?: ErrorHandler
 
@@ -117,6 +118,15 @@ export class KnexGql {
 
   schemaToTypeScriptSchema() {
     return new TypeScriptSchemaGetter(this.schema).getCode()
+  }
+
+  async prepareTableColumnsMap() {
+    await Promise.all(
+      Array.from(this.tableNameMap, async ([_, tableName]) => {
+        const columns = Object.keys(await this.knex(tableName).columnInfo())
+        this.tableColumnsMap.set(tableName, columns)
+      }),
+    )
   }
 
   async query(source: string, options: IExecutionOption = {}) {

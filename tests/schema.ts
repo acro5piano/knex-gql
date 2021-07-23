@@ -82,7 +82,7 @@ export const knexGql = new KnexGql({
       login: LoginMutation,
     },
     Query: {
-      viewer: ViewerQuery as any, // TODO
+      viewer: ViewerQuery,
     },
     User: UserField,
   } as Partial<Resolvers>,

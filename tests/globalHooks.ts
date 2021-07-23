@@ -1,6 +1,7 @@
 import test from 'ava'
 
 import { knex, knexWithLog } from './knex'
+import { knexGql } from './schema'
 import { log } from './util'
 
 test.beforeEach((t) => {
@@ -19,6 +20,7 @@ test.before(async () => {
   await knex.schema.createTable('users', (t) => {
     t.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'))
     t.string('name').notNullable()
+    t.string('email')
     t.timestamps(true, true)
   })
   await knex.schema.createTable('posts', (t) => {
@@ -27,6 +29,7 @@ test.before(async () => {
     t.string('title').notNullable()
     t.timestamps(true, true)
   })
+  await knexGql.prepareTableColumnsMap()
 })
 
 test.after(async () => {

@@ -2,6 +2,7 @@ import { GraphQLInt } from 'graphql'
 
 import { HasManyDirectiveArgs } from '../__generated__/schema'
 import { applyWhereToQuery } from '../execution/applyWhereToQuery'
+import { filterGraphQLSelections } from '../execution/filterSelection'
 import { IContext } from '../interfaces'
 import { createFieldManipulator } from '../schema/directive/createFieldManipulator'
 import { getArgumentValuesByDirectiveName, gql } from '../util'
@@ -21,7 +22,12 @@ export const HasManyDirective = createFieldManipulator<HasManyDirectiveArgs>({
       limit: Int = 20
     ) on FIELD_DEFINITION
   `,
-  schemaMapper: ({ directiveArgumentMap, fieldConfig, targetTableName }) => {
+  schemaMapper: ({
+    knexGql,
+    directiveArgumentMap,
+    fieldConfig,
+    targetTableName,
+  }) => {
     const whereArgs = getArgumentValuesByDirectiveName(
       'where',
       fieldConfig.astNode?.arguments,
@@ -30,7 +36,7 @@ export const HasManyDirective = createFieldManipulator<HasManyDirectiveArgs>({
     const limit = directiveArgumentMap['limit'] || DEFAULT_LIMIT
     switch (type) {
       case 'SIMPLE':
-        fieldConfig.resolve = (root, args, ctx: IContext) => {
+        fieldConfig.resolve = (root, args, ctx: IContext, info) => {
           return ctx.batchLoader
             .getLoader({
               type: 'hasMany',
@@ -38,6 +44,14 @@ export const HasManyDirective = createFieldManipulator<HasManyDirectiveArgs>({
               foreignKey: directiveArgumentMap['foreignKey'],
               queryModifier: (query) => {
                 applyWhereToQuery(query, whereArgs, args)
+                if (false) {
+                  const columns = filterGraphQLSelections({
+                    info,
+                    knexGql,
+                    table: targetTableName!,
+                  })
+                  query.select(columns)
+                }
               },
             })
             .load(root.id)
@@ -51,7 +65,7 @@ export const HasManyDirective = createFieldManipulator<HasManyDirectiveArgs>({
           type: GraphQLInt,
           defaultValue: 1,
         }
-        fieldConfig.resolve = (root, args, ctx: IContext) => {
+        fieldConfig.resolve = (root, args, ctx: IContext, info) => {
           const offset = (args['page'] - 1) * limit
           return ctx.batchLoader
             .getLoader({
@@ -64,6 +78,15 @@ export const HasManyDirective = createFieldManipulator<HasManyDirectiveArgs>({
               },
               queryModifier: (query) => {
                 applyWhereToQuery(query, whereArgs, args)
+                // TODO
+                if (false) {
+                  const columns = filterGraphQLSelections({
+                    info,
+                    knexGql,
+                    table: targetTableName!,
+                  })
+                  query.select(columns)
+                }
               },
             })
             .load(root.id)
