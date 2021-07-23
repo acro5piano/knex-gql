@@ -5,7 +5,7 @@ import { users } from '../fixtures.json'
 import { knex } from '../knex'
 import { knexGql } from '../schema'
 
-test('paginate', async (t) => {
+test('directive', async (t) => {
   await knex('users').insert(users)
 
   await knexGql
@@ -18,6 +18,7 @@ test('paginate', async (t) => {
             createdAt
             createdOn
             createdOnDayOfWeek
+            hashedName
           }
         }
       `,

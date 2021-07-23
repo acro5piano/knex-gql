@@ -1,18 +1,21 @@
 import path from 'path'
 
 import { KnexGql, gql } from '../src'
+import { MutationResolvers, QueryResolvers } from './__generated__/schema'
 import { DateFormatDirective } from './directives/DateFormatDirective'
 import { knexWithLog } from './knex'
 import { LoginMutation } from './resolvers/LoginMutation'
+import { UserField } from './resolvers/UserField'
 import { ViewerQuery } from './resolvers/ViewerQuery'
 
 const typeDefs = gql`
   type User @table(name: "users") {
     id: ID!
     name: String!
+    hashedName: String!
     createdAt: DateTime!
-    createdOn: String! @dateFormat(format: "YYYY-MM-DD")
-    createdOnDayOfWeek: String! @dateFormat(format: "ddd")
+    createdOn: String! @dateFormat(key: "createdAt", format: "YYYY-MM-DD")
+    createdOnDayOfWeek: String! @dateFormat(key: "createdAt", format: "ddd")
     posts(title: String @where(operator: "LIKE")): [Post!]!
       @hasMany(foreignKey: "userId")
     pageinatedPosts(title: String @where(operator: "LIKE")): [Post!]!
@@ -49,14 +52,13 @@ const typeDefs = gql`
     allUsers: [User!]! @all
     users(name: String @where(operator: "ILIKE")): [User!]! @paginate(limit: 5)
     post(id: ID! @where): Post @first
-    viewer: User @useResolver(resolver: "ViewerQuery")
+    viewer: User
   }
 
   type Mutation {
     createUser(input: UserInput!): User! @insert
     createPost(input: PostInput!): Post! @insert
     login(userId: ID!, password: String!): LoginPayload!
-      @useResolver(resolver: "LoginMutation")
   }
 `
 
@@ -64,10 +66,16 @@ export const knexGql = new KnexGql({
   knex: knexWithLog,
   typeDefs,
   directiveResolvers: [DateFormatDirective],
-  fieldResolvers: [
-    LoginMutation,
-    ViewerQuery as any, // TODO
-  ],
+  fieldResolvers: [],
+  resolvers: {
+    Mutation: {
+      login: LoginMutation,
+    },
+    Query: {
+      viewer: ViewerQuery as any, // TODO
+    },
+    User: UserField,
+  } as Partial<MutationResolvers & QueryResolvers>,
   emitSchema: path.resolve(__dirname, '__generated__/schema.gql'),
   emitTypeScriptDefs: path.resolve(__dirname, '__generated__/schema.ts'),
 })

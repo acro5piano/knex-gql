@@ -16,7 +16,7 @@ directive @paginate(limit: Int = 20) on FIELD_DEFINITION
 
 directive @useResolver(resolver: String!) on FIELD_DEFINITION
 
-directive @dateFormat(format: String = "YYYY-MM-DD") on FIELD_DEFINITION
+directive @dateFormat(key: String!, format: String = "YYYY-MM-DD") on FIELD_DEFINITION
 
 """
 A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
@@ -31,6 +31,7 @@ enum HasManyType {
 type User {
   id: ID!
   name: String!
+  hashedName: String!
   createdAt: DateTime!
   createdOn: String!
   createdOnDayOfWeek: String!

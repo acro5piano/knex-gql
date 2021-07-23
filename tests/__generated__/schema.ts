@@ -18,6 +18,7 @@ export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
 export interface User {
   id: string
   name: string
+  hashedName: string
   createdAt: string
   createdOn: string
   createdOnDayOfWeek: string
@@ -104,6 +105,7 @@ export interface MutationLoginArgs {
 export type UserResolvers = {
   id: ResolverFn<string, User, IKnexGqlContext, {}>
   name: ResolverFn<string, User, IKnexGqlContext, {}>
+  hashedName: ResolverFn<string, User, IKnexGqlContext, {}>
   createdAt: ResolverFn<string, User, IKnexGqlContext, {}>
   createdOn: ResolverFn<string, User, IKnexGqlContext, {}>
   createdOnDayOfWeek: ResolverFn<string, User, IKnexGqlContext, {}>

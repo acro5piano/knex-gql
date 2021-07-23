@@ -1,13 +1,6 @@
-import type { IContext, ICustomFieldResolver } from '../../src'
-import { knex } from '../knex'
+import { QueryResolvers } from '../__generated__/schema'
+import { users } from '../db'
 
-interface Context extends IContext {
-  userId: string
-}
-
-export const ViewerQuery: ICustomFieldResolver<{}, Context> = {
-  name: 'ViewerQuery',
-  resolve: async (_root, _args, ctx) => {
-    return knex('users').where({ id: ctx.userId }).first()
-  },
+export const ViewerQuery: QueryResolvers['viewer'] = (_root, _args, ctx) => {
+  return users().where({ id: ctx.userId }).first()
 }

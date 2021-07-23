@@ -1,4 +1,10 @@
+import crypto from 'crypto'
+
 export const log = (a: any) => console.log(JSON.stringify(a, undefined, 2))
+
+export function sha256(str: string) {
+  return crypto.createHash('sha256').update(str).digest('base64')
+}
 
 export const omitIdDeep = (obj: any): any => {
   return Object.keys(obj).reduce((o, key) => {

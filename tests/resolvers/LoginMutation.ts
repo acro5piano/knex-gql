@@ -1,10 +1,13 @@
 import { sign } from 'jsonwebtoken'
 
 import { MutationResolvers } from '../__generated__/schema'
-import { knex } from '../knex'
+import { users } from '../db'
 
-const loginMutationFn: MutationResolvers['login'] = async (_root, args) => {
-  const user = await knex('users').where({ id: args.userId }).first()
+export const LoginMutation: MutationResolvers['login'] = async (
+  _root,
+  args,
+) => {
+  const user = await users().where({ id: args.userId }).first()
   if (!user) {
     throw new Error(`no such user: ${args.userId}`)
   }
@@ -18,10 +21,4 @@ const loginMutationFn: MutationResolvers['login'] = async (_root, args) => {
     ),
     user,
   }
-}
-
-// TODO: This type def is very verbose
-export const LoginMutation = {
-  name: 'LoginMutation',
-  resolve: loginMutationFn,
 }

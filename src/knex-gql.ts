@@ -4,7 +4,7 @@ import {
   ExecutableSchemaTransformation,
   makeExecutableSchema,
 } from '@graphql-tools/schema'
-import { IDirectiveResolvers } from '@graphql-tools/utils'
+import { IDirectiveResolvers, IResolvers } from '@graphql-tools/utils'
 import { GraphQLError, GraphQLSchema, graphql, printSchema } from 'graphql'
 import type { Knex } from 'knex'
 
@@ -30,6 +30,7 @@ interface KnexGqlOptions {
   fieldResolvers?: ICustomFieldResolver[]
   emitSchema?: boolean | string
   emitTypeScriptDefs?: boolean | string
+  resolvers: IResolvers
 }
 
 export class KnexGql {
@@ -47,6 +48,7 @@ export class KnexGql {
     fieldResolvers = [],
     emitSchema = false,
     emitTypeScriptDefs = false,
+    resolvers,
   }: KnexGqlOptions) {
     this.knex = knex
     this.errorHandler = errorHandler
@@ -94,7 +96,7 @@ export class KnexGql {
         ...customDirectiveResolvers,
       },
       schemaTransforms: [...presetsSchemaTransforms],
-      resolvers: resolveFunctions,
+      resolvers: [resolvers, resolveFunctions],
     })
 
     if (emitSchema !== false) {
