@@ -1,12 +1,13 @@
 {
   "name": "knex-gql",
-  "version": "0.0.2-dev",
+  "version": "0.0.5-dev",
   "description": "A Schema First GraphQL Query Builder for Knex.js",
   "main": "dist/index.js",
   "repository": "git@github.com:acro5piano/knex-gql",
   "scripts": {
     "r": "ts-node -T",
     "prepare": "rm -f node_modules/graphql-fields-list/index.ts",
+    "prepublish": "yarn build",
     "pgcli": "pgcli postgres://postgres:postgres@127.0.0.1:11155/postgres",
     "test": "ava --serial",
     "build": "rimraf dist && tsc -p tsconfig.prod.json"

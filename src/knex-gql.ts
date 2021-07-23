@@ -162,14 +162,20 @@ export class KnexGql {
       schema: this.schema,
       source,
       variableValues: options.variables,
-      contextValue: {
-        batchLoader: new BatchLoader(this),
+      contextValue: this.mergeKnexGqlContext(() => ({
         ...(options.context || {}),
-      },
+      })),
     })
     if (result.errors && this.errorHandler) {
       this.errorHandler(result.errors)
     }
     return result
+  }
+
+  mergeKnexGqlContext<T>(givenCtx: T) {
+    return {
+      batchLoader: new BatchLoader(this),
+      ...(typeof givenCtx === 'function' ? givenCtx() : givenCtx),
+    }
   }
 }
