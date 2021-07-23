@@ -91,10 +91,14 @@ function createLoader({
         })
       }
     case 'belongsTo':
-      return new Dataloader((ids: readonly string[]) =>
-        knex(targetTable)
-          .whereIn('id', ids)
-          .then((rows) => ids.map((id) => rows.find((row) => row.id === id))),
-      )
+      return new Dataloader((ids: readonly string[]) => {
+        const query = knex(targetTable).whereIn('id', ids)
+        if (queryModifier) {
+          queryModifier(query)
+        }
+        return query.then((rows) =>
+          ids.map((id) => rows.find((row) => row.id === id)),
+        )
+      })
   }
 }

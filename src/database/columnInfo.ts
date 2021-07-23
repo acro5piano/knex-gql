@@ -1,8 +1,9 @@
 import { Knex } from 'knex'
 
-interface DatabaseTableInfo {
+export interface DatabaseTableInfo {
   name: string
   columns: string[]
+  referenceColumns: string[]
 }
 
 export async function getColumnInfo(
@@ -15,6 +16,7 @@ export async function getColumnInfo(
       return {
         name: tableName,
         columns: Object.keys(rawColumns),
+        referenceColumns: [],
       }
     }),
   )

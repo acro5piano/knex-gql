@@ -43,3 +43,7 @@ export function getArgumentValuesByDirectiveName(
 export function getMapValues<K, V>(map: Map<K, V>) {
   return Array.from(map, ([_, v]) => v)
 }
+
+export function keys<T>(obj: T): Array<keyof T> {
+  return Object.keys(obj) as any
+}

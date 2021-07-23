@@ -1,5 +1,6 @@
 import type { ExecutableSchemaTransformation } from '@graphql-tools/schema'
-import type { DirectiveResolverFn, IFieldResolver } from '@graphql-tools/utils'
+import type { IFieldResolver } from '@graphql-tools/utils'
+import type { GraphQLResolveInfo } from 'graphql'
 
 import type { BatchLoader } from './execution/BatchLoader'
 import type { KnexGql } from './knex-gql'
@@ -34,10 +35,23 @@ export interface ICustomFieldResolver<
   resolve: ICustomResoverFn<T, Ctx, Args>
 }
 
-export interface ICustomFieldDirective {
+export type DirectiveResolverFn<
+  TResult = {},
+  TParent = {},
+  TContext = {},
+  TArgs = {},
+> = (
+  next: () => Promise<TResult>,
+  parent: TParent,
+  args: TArgs,
+  context: TContext,
+  info: GraphQLResolveInfo,
+) => TResult | Promise<TResult>
+
+export interface ICustomFieldDirective<T> {
   name: string
   definition: string
-  resolve: DirectiveResolverFn<any, IContext>
+  resolve: DirectiveResolverFn<any, any, IContext, T>
 }
 
 export type SimplePagenatorArgs = {

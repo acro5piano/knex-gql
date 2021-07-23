@@ -32,22 +32,22 @@ export const HasManyDirective = createFieldManipulator<HasManyDirectiveArgs>({
       'where',
       fieldConfig.astNode?.arguments,
     )
-    const type = directiveArgumentMap.type
-    const limit = directiveArgumentMap['limit'] || DEFAULT_LIMIT
-    switch (type) {
+    const limit = directiveArgumentMap.limit || DEFAULT_LIMIT
+    switch (directiveArgumentMap.type) {
       case 'SIMPLE':
         fieldConfig.resolve = (root, args, ctx: IContext, info) => {
           return ctx.batchLoader
             .getLoader({
               type: 'hasMany',
               targetTable: targetTableName!,
-              foreignKey: directiveArgumentMap['foreignKey'],
+              foreignKey: directiveArgumentMap.foreignKey,
               queryModifier: (query) => {
                 applyWhereToQuery(query, whereArgs, args)
                 const columns = filterGraphQLSelections({
                   info,
                   knexGql,
                   table: targetTableName!,
+                  alwaysLoadColumns: [directiveArgumentMap.foreignKey],
                 })
                 query.select(columns)
               },
@@ -69,7 +69,7 @@ export const HasManyDirective = createFieldManipulator<HasManyDirectiveArgs>({
             .getLoader({
               type: 'hasMany',
               targetTable: targetTableName!,
-              foreignKey: directiveArgumentMap['foreignKey'],
+              foreignKey: directiveArgumentMap.foreignKey,
               page: {
                 limit,
                 offset,
@@ -80,6 +80,7 @@ export const HasManyDirective = createFieldManipulator<HasManyDirectiveArgs>({
                   info,
                   knexGql,
                   table: targetTableName!,
+                  alwaysLoadColumns: [directiveArgumentMap.foreignKey],
                 })
                 query.select(columns)
               },

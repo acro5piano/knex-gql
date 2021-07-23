@@ -1,6 +1,7 @@
 import { GraphQLInt } from 'graphql'
 
 import { PaginateDirectiveArgs } from '../__generated__/schema'
+import { filterGraphQLSelections } from '../execution/filterSelection'
 import { getKnexQuery } from '../execution/getKnexQuery'
 import { createFieldManipulator } from '../schema/directive/createFieldManipulator'
 import { gql } from '../util'
@@ -38,7 +39,16 @@ export const PaginateDirective = createFieldManipulator<PaginateDirectiveArgs>({
         nextValue,
         args,
       )
-      return query.limit(limit).offset(offset)
+      return query
+        .limit(limit)
+        .offset(offset)
+        .select(
+          filterGraphQLSelections({
+            info,
+            knexGql,
+            table: targetTableName!,
+          }),
+        )
     }
     return fieldConfig
   },

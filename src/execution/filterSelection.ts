@@ -7,21 +7,33 @@ interface FilterSelectionsProps {
   info: GraphQLResolveInfo
   table: string
   knexGql: KnexGql
+  alwaysLoadColumns?: string[]
 }
 
 export function filterGraphQLSelections({
   info,
   table,
   knexGql,
+  alwaysLoadColumns = [],
 }: FilterSelectionsProps) {
   const existingColumns = knexGql.tableColumnsMap.get(table)
   if (!existingColumns) {
-    return [] // This selects all columns (select `*`)
+    // Empty array force Knex to select all columns (select `*`)
+    return []
   }
-  const selectionSets = fieldsList(info)
+  const selectionSets = [...fieldsList(info), ...alwaysLoadColumns]
   if (!selectionSets.includes('id')) {
     selectionSets.push('id')
   }
 
-  return existingColumns.filter((c) => selectionSets.includes(c))
+  // Always load foreign key to prepare Dataloader
+  knexGql.tableColumnsMap.forEach((info) => {
+    selectionSets.push(...info.referenceColumns)
+  })
+
+  if (!selectionSets.includes('id')) {
+    selectionSets.push('id')
+  }
+
+  return existingColumns.columns.filter((c) => selectionSets.includes(c))
 }

@@ -4,11 +4,15 @@ import {
   ExecutableSchemaTransformation,
   makeExecutableSchema,
 } from '@graphql-tools/schema'
-import { IDirectiveResolvers, IResolvers } from '@graphql-tools/utils'
+import {
+  IDirectiveResolvers,
+  IResolvers,
+  getUserTypesFromSchema,
+} from '@graphql-tools/utils'
 import { GraphQLError, GraphQLSchema, graphql, printSchema } from 'graphql'
 import type { Knex } from 'knex'
 
-import { getColumnInfo } from './database/columnInfo'
+import { DatabaseTableInfo, getColumnInfo } from './database/columnInfo'
 import { directives } from './directives'
 import { BatchLoader } from './execution/BatchLoader'
 import type {
@@ -20,14 +24,14 @@ import type {
 } from './interfaces'
 import { defaultSchema, resolveFunctions } from './schema'
 import { TypeScriptSchemaGetter } from './typegen'
-import { getMapValues } from './util'
+import { getMapValues, keys } from './util'
 
 type ErrorHandler = (errors: ReadonlyArray<GraphQLError>) => any
 
 interface KnexGqlOptions {
   knex: Knex
   typeDefs: string
-  directiveResolvers?: ICustomFieldDirective[]
+  directiveResolvers?: ICustomFieldDirective<any>[]
   errorHandler?: ErrorHandler
   fieldResolvers?: ICustomFieldResolver[]
   emitSchema?: boolean | string
@@ -39,7 +43,7 @@ export class KnexGql {
   schema: GraphQLSchema
   knex: Knex
   tableNameMap = new Map<string, string>()
-  tableColumnsMap = new Map<string, string[]>()
+  tableColumnsMap = new Map<string, DatabaseTableInfo>()
   resolverMap = new Map<string, ICustomResoverFn<any, IContext, any>>()
   errorHandler?: ErrorHandler
 
@@ -127,8 +131,29 @@ export class KnexGql {
       this.knex,
       getMapValues(this.tableNameMap),
     )
+    getUserTypesFromSchema(this.schema).map((type) => {
+      const fields = type.getFields()
+      keys(fields).map((key) => {
+        const field = fields[key]
+        const relationDirective = field?.astNode?.directives?.find(
+          (directive) =>
+            directive.name.value === 'hasMany' ||
+            directive.name.value === 'belongsTo',
+        )
+        if (relationDirective) {
+          const foreignKey = relationDirective?.arguments?.find(
+            (arg) => arg.name.value === 'foreignKey',
+          )
+          if (foreignKey?.value?.kind === 'StringValue') {
+            infos
+              .find((info) => info.name === key)
+              ?.referenceColumns?.push(foreignKey?.value?.value)
+          }
+        }
+      })
+    })
     infos.forEach((info) => {
-      this.tableColumnsMap.set(info.name, info.columns)
+      this.tableColumnsMap.set(info.name, info)
     })
   }
 

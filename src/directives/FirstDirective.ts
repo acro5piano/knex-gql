@@ -1,3 +1,4 @@
+import { filterGraphQLSelections } from '../execution/filterSelection'
 import { getKnexQuery } from '../execution/getKnexQuery'
 import { createFieldManipulator } from '../schema/directive/createFieldManipulator'
 import { gql } from '../util'
@@ -21,6 +22,12 @@ export const FirstDirective = createFieldManipulator({
         targetTableName!,
         nextValue,
         args,
+      ).select(
+        filterGraphQLSelections({
+          info,
+          knexGql,
+          table: targetTableName!,
+        }),
       )
       return query.first()
     }
