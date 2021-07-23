@@ -22,7 +22,7 @@ import type {
   ICustomResoverFn,
   IExecutionOption,
 } from './interfaces'
-import { defaultSchema, resolveFunctions } from './schema'
+import { defaultSchema, resolveFunctions } from './schema/defaultSchema'
 import { TypeScriptSchemaGetter } from './typegen'
 import { getMapValues, keys } from './util'
 
