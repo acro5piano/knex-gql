@@ -1,7 +1,7 @@
 import path from 'path'
 
 import { KnexGql, gql } from '../src'
-import { MutationResolvers, QueryResolvers } from './__generated__/schema'
+import { Resolvers } from './__generated__/schema'
 import { DateFormatDirective } from './directives/DateFormatDirective'
 import { knexWithLog } from './knex'
 import { LoginMutation } from './resolvers/LoginMutation'
@@ -59,6 +59,8 @@ const typeDefs = gql`
     firstUser: User @first
     allUsers: [User!]! @all
     users(name: String @where(operator: "ILIKE")): [User!]! @paginate(limit: 5)
+    userSearch(term: String!): [User!]!
+      @paginate(queryBuilder: "SearchUserQuery", limit: 5)
     post(id: ID! @where): Post @first
     viewer: User
   }
@@ -83,7 +85,7 @@ export const knexGql = new KnexGql({
       viewer: ViewerQuery as any, // TODO
     },
     User: UserField,
-  } as Partial<MutationResolvers & QueryResolvers>,
+  } as Partial<Resolvers>,
   emitSchema: path.resolve(__dirname, '__generated__/schema.gql'),
   emitTypeScriptDefs: path.resolve(__dirname, '__generated__/schema.ts'),
 })

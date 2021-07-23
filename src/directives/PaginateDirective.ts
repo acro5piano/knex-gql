@@ -8,7 +8,10 @@ import { getRawType, gql } from '../util'
 export const PaginateDirective: IDirective = {
   name: 'paginate',
   definition: gql`
-    directive @paginate(limit: Int = 20) on FIELD_DEFINITION
+    directive @paginate(
+      queryBuilder: String
+      limit: Int = 20
+    ) on FIELD_DEFINITION
   `,
   getSchemaTransformer: (knexGql) => {
     return function paginateDirective(schema) {

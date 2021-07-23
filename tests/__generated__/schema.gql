@@ -12,7 +12,7 @@ directive @hasMany(foreignKey: String!, type: HasManyType = SIMPLE, limit: Int =
 
 directive @where(operator: String = "=") on ARGUMENT_DEFINITION
 
-directive @paginate(limit: Int = 20) on FIELD_DEFINITION
+directive @paginate(queryBuilder: String, limit: Int = 20) on FIELD_DEFINITION
 
 directive @useResolver(resolver: String!) on FIELD_DEFINITION
 
@@ -65,6 +65,7 @@ type Query {
   firstUser: User
   allUsers: [User!]!
   users(name: String, page: Int = 1): [User!]!
+  userSearch(term: String!, page: Int = 1): [User!]!
   post(id: ID!): Post
   viewer: User
 }

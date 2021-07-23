@@ -26,12 +26,22 @@ export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
   `
   argumentCode = ''
   resolversCode = ''
+  allResolverCode = 'export interface Resolvers {'
 
   constructor(private schema: GraphQLSchema) {}
 
   getCode() {
     this.code += this.getTypeScriptSchema()
-    return this.code + '\n\n' + this.argumentCode + '\n\n' + this.resolversCode
+    return (
+      this.code +
+      '\n\n' +
+      this.argumentCode +
+      '\n\n' +
+      this.resolversCode +
+      '\n\n' +
+      this.allResolverCode +
+      '\n}'
+    )
   }
 
   getTypeScriptSchema() {
@@ -53,9 +63,12 @@ export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
 
   objectTypeToTS(type: ObjectTypeDefinitionNode) {
     if (type.fields) {
-      this.resolversCode += `\n\nexport type ${
-        type.name.value
-      }Resolvers = {${this.fieldToResolverTS(type.name.value, type.fields)}\n}`
+      const resolverName = type.name.value + 'Resolvers'
+      this.resolversCode += `\n\nexport type ${resolverName} = {${this.fieldToResolverTS(
+        type.name.value,
+        type.fields,
+      )}\n}`
+      this.allResolverCode += `\n  ${type.name.value}: ${resolverName}`
     }
 
     return `export interface ${type.name.value} {${

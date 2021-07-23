@@ -52,6 +52,7 @@ export interface Query {
   firstUser?: User
   allUsers: User[]
   users: User[]
+  userSearch: User[]
   post?: Post
   viewer?: User
 }
@@ -80,6 +81,11 @@ export interface QueryUserArgs {
 
 export interface QueryUsersArgs {
   name: string
+  page: number
+}
+
+export interface QueryUserSearchArgs {
+  term: string
   page: number
 }
 
@@ -139,6 +145,7 @@ export type QueryResolvers = {
   firstUser?: ResolverFn<User| undefined | null, Query, IKnexGqlContext, {}>
   allUsers: ResolverFn<User[], Query, IKnexGqlContext, {}>
   users: ResolverFn<User[], Query, IKnexGqlContext, QueryUsersArgs>
+  userSearch: ResolverFn<User[], Query, IKnexGqlContext, QueryUserSearchArgs>
   post?: ResolverFn<Post| undefined | null, Query, IKnexGqlContext, QueryPostArgs>
   viewer?: ResolverFn<User| undefined | null, Query, IKnexGqlContext, {}>
 }
@@ -147,4 +154,14 @@ export type MutationResolvers = {
   createUser: ResolverFn<User, Mutation, IKnexGqlContext, MutationCreateUserArgs>
   createPost: ResolverFn<Post, Mutation, IKnexGqlContext, MutationCreatePostArgs>
   login: ResolverFn<LoginPayload, Mutation, IKnexGqlContext, MutationLoginArgs>
+}
+
+export interface Resolvers {
+  User: UserResolvers
+  UserInput: UserInputResolvers
+  Post: PostResolvers
+  PostInput: PostInputResolvers
+  LoginPayload: LoginPayloadResolvers
+  Query: QueryResolvers
+  Mutation: MutationResolvers
 }
