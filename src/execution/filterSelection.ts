@@ -14,13 +14,13 @@ export function filterGraphQLSelections({
   table,
   knexGql,
 }: FilterSelectionsProps) {
+  const existingColumns = knexGql.tableColumnsMap.get(table)
+  if (!existingColumns) {
+    return [] // This selects all columns (select `*`)
+  }
   const selectionSets = fieldsList(info)
   if (!selectionSets.includes('id')) {
     selectionSets.push('id')
-  }
-  const existingColumns = knexGql.tableColumnsMap.get(table)
-  if (!existingColumns) {
-    return selectionSets
   }
 
   return existingColumns.filter((c) => selectionSets.includes(c))

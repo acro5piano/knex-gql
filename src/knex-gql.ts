@@ -8,6 +8,7 @@ import { IDirectiveResolvers, IResolvers } from '@graphql-tools/utils'
 import { GraphQLError, GraphQLSchema, graphql, printSchema } from 'graphql'
 import type { Knex } from 'knex'
 
+import { getColumnInfo } from './database/columnInfo'
 import { directives } from './directives'
 import { BatchLoader } from './execution/BatchLoader'
 import type {
@@ -19,6 +20,7 @@ import type {
 } from './interfaces'
 import { defaultSchema, resolveFunctions } from './schema'
 import { TypeScriptSchemaGetter } from './typegen'
+import { getMapValues } from './util'
 
 type ErrorHandler = (errors: ReadonlyArray<GraphQLError>) => any
 
@@ -121,12 +123,13 @@ export class KnexGql {
   }
 
   async prepareTableColumnsMap() {
-    await Promise.all(
-      Array.from(this.tableNameMap, async ([_, tableName]) => {
-        const columns = Object.keys(await this.knex(tableName).columnInfo())
-        this.tableColumnsMap.set(tableName, columns)
-      }),
+    const infos = await getColumnInfo(
+      this.knex,
+      getMapValues(this.tableNameMap),
     )
+    infos.forEach((info) => {
+      this.tableColumnsMap.set(info.name, info.columns)
+    })
   }
 
   async query(source: string, options: IExecutionOption = {}) {

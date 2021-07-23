@@ -44,14 +44,12 @@ export const HasManyDirective = createFieldManipulator<HasManyDirectiveArgs>({
               foreignKey: directiveArgumentMap['foreignKey'],
               queryModifier: (query) => {
                 applyWhereToQuery(query, whereArgs, args)
-                if (false) {
-                  const columns = filterGraphQLSelections({
-                    info,
-                    knexGql,
-                    table: targetTableName!,
-                  })
-                  query.select(columns)
-                }
+                const columns = filterGraphQLSelections({
+                  info,
+                  knexGql,
+                  table: targetTableName!,
+                })
+                query.select(columns)
               },
             })
             .load(root.id)
@@ -78,15 +76,12 @@ export const HasManyDirective = createFieldManipulator<HasManyDirectiveArgs>({
               },
               queryModifier: (query) => {
                 applyWhereToQuery(query, whereArgs, args)
-                // TODO
-                if (false) {
-                  const columns = filterGraphQLSelections({
-                    info,
-                    knexGql,
-                    table: targetTableName!,
-                  })
-                  query.select(columns)
-                }
+                const columns = filterGraphQLSelections({
+                  info,
+                  knexGql,
+                  table: targetTableName!,
+                })
+                query.select(columns)
               },
             })
             .load(root.id)
