@@ -35,7 +35,7 @@ export interface ICustomFieldResolver<
   resolve: ICustomResoverFn<T, Ctx, Args>
 }
 
-export type DirectiveResolverFn<
+export type IDirectiveResolverFn<
   TResult = {},
   TParent = {},
   TContext = {},
@@ -51,10 +51,10 @@ export type DirectiveResolverFn<
 export interface ICustomFieldDirective<T> {
   name: string
   definition: string
-  resolve: DirectiveResolverFn<any, any, IContext, T>
+  resolve: IDirectiveResolverFn<any, any, IContext, T>
 }
 
-export type SimplePagenatorArgs = {
+export type ISimplePagenatorArgs = {
   limit: number
   offset: number
 }
