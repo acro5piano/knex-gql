@@ -2,6 +2,7 @@ import { AllDirective } from './AllDirective'
 import { BelongsToDirective } from './BelongsToDirective'
 import { FirstDirective } from './FirstDirective'
 import { HasManyDirective } from './HasManyDirective'
+import { HasManyThroughDirective } from './HasManyThroughDirective'
 import { InsertDirective } from './InsertDirective'
 import { PaginateDirective } from './PaginateDirective'
 import { TableDirective } from './TableDirective'
@@ -19,4 +20,5 @@ export const directives = [
   WhereDirective,
   PaginateDirective,
   UseResolverDirective,
+  HasManyThroughDirective,
 ]

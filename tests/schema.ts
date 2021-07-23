@@ -28,6 +28,16 @@ const typeDefs = gql`
       @hasMany(foreignKey: "userId")
     pageinatedPosts(title: String @where(operator: "LIKE")): [Post!]!
       @hasMany(foreignKey: "userId", type: PAGINATOR, limit: 7)
+    comments(content: String @where(operator: "LIKE")): [Comment!]!
+      @hasManyThrough(
+        through: "posts"
+        from: "userId"
+        to: "postId"
+        type: PAGINATOR
+        limit: 3
+      )
+    commentsSimple(content: String @where(operator: "LIKE")): [Comment!]!
+      @hasManyThrough(through: "posts", from: "userId", to: "postId", limit: 3)
   }
 
   input UserInput {
@@ -39,6 +49,14 @@ const typeDefs = gql`
     userId: ID!
     title: String!
     user: User! @belongsTo(foreignKey: "userId")
+    comments: [Comment!]!
+      @hasMany(foreignKey: "postId", type: PAGINATOR, limit: 3)
+  }
+
+  type Comment @table(name: "comments") {
+    id: ID!
+    postId: ID!
+    content: String!
   }
 
   input PostInput {

@@ -21,7 +21,7 @@ export function filterGraphQLSelections({
     // Empty array force Knex to select all columns (select `*`)
     return []
   }
-  const selectionSets = [...fieldsList(info), ...alwaysLoadColumns]
+  const selectionSets = fieldsList(info)
   if (!selectionSets.includes('id')) {
     selectionSets.push('id')
   }
@@ -31,9 +31,8 @@ export function filterGraphQLSelections({
     selectionSets.push(...info.referenceColumns)
   })
 
-  if (!selectionSets.includes('id')) {
-    selectionSets.push('id')
-  }
-
-  return existingColumns.columns.filter((c) => selectionSets.includes(c))
+  return [
+    ...existingColumns.columns.filter((c) => selectionSets.includes(c)),
+    ...alwaysLoadColumns,
+  ]
 }

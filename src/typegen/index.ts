@@ -12,7 +12,6 @@ import {
 export class TypeScriptSchemaGetter {
   code = `/* eslint-disable */
 import { GraphQLResolveInfo } from 'graphql';
-import { KnexGqlContext } from 'knex-gql'
 
 export type ResolverFn<TResult, TParent, TContext, TArgs> = (
   parent: TParent,

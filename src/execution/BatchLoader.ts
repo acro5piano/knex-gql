@@ -4,12 +4,17 @@ import { Knex } from 'knex'
 import type { ISimplePagenatorArgs } from '../interfaces'
 import type { KnexGql } from '../knex-gql'
 
-type LoaderType = 'hasMany' | 'belongsTo'
+type LoaderType = 'hasMany' | 'hasManyThrough' | 'belongsTo'
 
 interface GetLoaderProps {
   type: LoaderType
   targetTable: string
   foreignKey?: string
+  through?: {
+    table: string
+    from: string
+    to: string
+  }
   page?: ISimplePagenatorArgs
   queryModifier?: (query: Knex.QueryBuilder) => void
 }
@@ -27,6 +32,7 @@ export class BatchLoader {
     type,
     targetTable,
     foreignKey = 'id',
+    through,
     page,
     queryModifier,
   }: GetLoaderProps) {
@@ -41,6 +47,7 @@ export class BatchLoader {
       type,
       targetTable,
       foreignKey,
+      through,
       knex: this.knexGql.knex,
       page,
       queryModifier,
@@ -54,6 +61,7 @@ function createLoader({
   type,
   targetTable,
   foreignKey = 'id',
+  through,
   page,
   knex,
   queryModifier,
@@ -87,6 +95,55 @@ function createLoader({
           }
           return query.then((rows) =>
             ids.map((id) => rows.filter((row) => row[foreignKey] === id)),
+          )
+        })
+      }
+    case 'hasManyThrough':
+      if (!through) {
+        throw new Error('no `through` key found')
+      }
+      if (page) {
+        return new Dataloader((ids: readonly string[]) => {
+          const query = knex(
+            knex(targetTable)
+              .select(`${targetTable}.*`, `${through.table}.${through.from}`)
+              .rowNumber('relation_index', `${through.table}.id`, through.from) // TODO: make order by enable
+              .innerJoin(
+                through.table,
+                `${through.table}.id`,
+                `${targetTable}.${through.to}`,
+              )
+              .whereIn(through.from, ids)
+              .as('_t'),
+          ).whereBetween(knex.ref('relation_index') as any, [
+            page.offset,
+            page.offset + page.limit,
+          ])
+          if (queryModifier) {
+            queryModifier(query)
+          }
+          return query.then((rows) =>
+            ids.map((id) => rows.filter((row) => row[through.from] === id)),
+          )
+        })
+      } else {
+        return new Dataloader((ids: readonly string[]) => {
+          const query = knex(
+            knex(targetTable)
+              .select(`${targetTable}.*`, `${through.table}.${through.from}`)
+              .innerJoin(
+                through.table,
+                `${through.table}.id`,
+                `${targetTable}.${through.to}`,
+              )
+              .whereIn(through.from, ids)
+              .as('_t'),
+          )
+          if (queryModifier) {
+            queryModifier(query)
+          }
+          return query.then((rows) =>
+            ids.map((id) => rows.filter((row) => row[through.from] === id)),
           )
         })
       }

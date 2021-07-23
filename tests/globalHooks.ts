@@ -29,6 +29,12 @@ test.before(async () => {
     t.string('title').notNullable()
     t.timestamps(true, true)
   })
+  await knex.schema.createTable('comments', (t) => {
+    t.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'))
+    t.uuid('post_id').notNullable().references('posts.id').onDelete('CASCADE')
+    t.string('content').notNullable()
+    t.timestamps(true, true)
+  })
   await knexGql.prepareTableColumnsMap()
 })
 

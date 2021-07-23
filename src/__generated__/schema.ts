@@ -1,8 +1,6 @@
 /* eslint-disable */
 import { GraphQLResolveInfo } from 'graphql';
 
-export interface IKnexGqlContext {}
-
 export type ResolverFn<TResult, TParent, TContext, TArgs> = (
   parent: TParent,
   args: TArgs,
@@ -40,6 +38,14 @@ export interface PaginateDirectiveArgs {
 
 export interface UseResolverDirectiveArgs {
   resolver: string
+}
+
+export interface HasManyThroughDirectiveArgs {
+  through: string
+  from: string
+  to: string
+  type: HasManyType
+  limit: number
 }
 
 export type HasManyType = 

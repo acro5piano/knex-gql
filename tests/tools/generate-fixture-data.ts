@@ -39,8 +39,23 @@ const posts = R.pipe(
   ),
 )
 
+const comments = R.pipe(
+  posts,
+  R.flatMap((post) =>
+    R.pipe(
+      R.range(1, 10),
+      R.map((i) => ({
+        id: v4(),
+        postId: post.id,
+        content: `comment for ${post.title} - ${i}`,
+        ...getTimeStamps(i),
+      })),
+    ),
+  ),
+)
+
 fs.writeFileSync(
   path.resolve(__dirname, '../fixtures.json'),
-  JSON.stringify({ users, posts }, undefined, 2),
+  JSON.stringify({ users, posts, comments }, undefined, 2),
   'utf8',
 )

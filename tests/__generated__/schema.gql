@@ -16,6 +16,8 @@ directive @paginate(queryBuilder: String, limit: Int = 20) on FIELD_DEFINITION
 
 directive @useResolver(resolver: String!) on FIELD_DEFINITION
 
+directive @hasManyThrough(through: String!, from: String!, to: String!, type: HasManyType = SIMPLE, limit: Int = 20) on FIELD_DEFINITION
+
 directive @dateFormat(key: String!, format: String = "YYYY-MM-DD") on FIELD_DEFINITION
 
 """
@@ -37,6 +39,8 @@ type User {
   createdOnDayOfWeek: String!
   posts(title: String): [Post!]!
   pageinatedPosts(title: String, page: Int = 1): [Post!]!
+  comments(content: String, page: Int = 1): [Comment!]!
+  commentsSimple(content: String): [Comment!]!
 }
 
 input UserInput {
@@ -48,6 +52,13 @@ type Post {
   userId: ID!
   title: String!
   user: User!
+  comments(page: Int = 1): [Comment!]!
+}
+
+type Comment {
+  id: ID!
+  postId: ID!
+  content: String!
 }
 
 input PostInput {
