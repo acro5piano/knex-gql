@@ -1,30 +1,16 @@
-import { MapperKind, getDirectives, mapSchema } from '@graphql-tools/utils'
+import { createFieldManipulator } from '../schema/directive/createFieldManipulator'
+import { gql } from '../util'
 
-import { IDirective } from '../interfaces'
-import { getRawType, gql } from '../util'
-
-export const AllDirective: IDirective = {
+export const AllDirective = createFieldManipulator({
   name: 'all',
   definition: gql`
     directive @all on FIELD_DEFINITION
   `,
-  getSchemaTransformer: (knexGql) => {
-    return function hasManyDirective(schema) {
-      return mapSchema(schema, {
-        [MapperKind.OBJECT_FIELD]: (fieldConfig) => {
-          const directives = getDirectives(schema, fieldConfig)
-          const directiveArgumentMap = directives['all']
-          if (directiveArgumentMap) {
-            const typeName = getRawType(fieldConfig.type)
-            const tableName = knexGql.tableNameMap.get(typeName.name)
-            fieldConfig.resolve = (_root, _args) => {
-              const query = knexGql.knex(tableName)
-              return query
-            }
-          }
-          return fieldConfig
-        },
-      })
+  schemaMapper: ({ fieldConfig, targetTableName, knexGql }) => {
+    fieldConfig.resolve = (_root, _args) => {
+      const query = knexGql.knex(targetTableName)
+      return query
     }
+    return fieldConfig
   },
-}
+})

@@ -1,27 +1,16 @@
-import { MapperKind, getDirectives, mapSchema } from '@graphql-tools/utils'
-
-import { IDirective } from '../interfaces'
+import { createFieldManipulator } from '../schema/directive/createFieldManipulator'
 import { gql } from '../util'
 
-export const UseResolverDirective: IDirective = {
+// TODO: No more need this??
+export const UseResolverDirective = createFieldManipulator({
   name: 'useResolver',
   definition: gql`
     directive @useResolver(resolver: String!) on FIELD_DEFINITION
   `,
-  getSchemaTransformer: (knexGql) => {
-    return function useResolverDirective(schema) {
-      return mapSchema(schema, {
-        [MapperKind.OBJECT_FIELD]: (fieldConfig) => {
-          const directives = getDirectives(schema, fieldConfig)
-          const directiveArgumentMap = directives['useResolver']
-          if (directiveArgumentMap) {
-            fieldConfig.resolve = knexGql.resolverMap.get(
-              directiveArgumentMap['resolver'],
-            )!
-          }
-          return fieldConfig
-        },
-      })
-    }
+  schemaMapper: ({ knexGql, fieldConfig, directiveArgumentMap }) => {
+    fieldConfig.resolve = knexGql.resolverMap.get(
+      directiveArgumentMap['resolver'],
+    )!
+    return fieldConfig
   },
-}
+})
