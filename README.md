@@ -15,13 +15,15 @@ Creating a GraphQL service with a Relational Database is a hard thing. We should
 
 So, why not integrate Knex with GraphQL directly?
 
-# POC
+# Getting Started
 
-For more details, please see Sample app. https://github.com/acro5piano/knex-gql-sample-app
+### Step 1. Install
 
-## tl;dr
+```
+yarn add knex-gql
+```
 
-First, define your schema with preset directives:
+### Step 2. Define GraphQL schema using SDL
 
 ```graphql
 # Schema.gql
@@ -57,60 +59,105 @@ type Mutation {
 }
 ```
 
-Then, query!
+- `@table` defines which table is associated with that type.
+- `@hasMany` and `belongsTo` define table relations. Relations are automatically batch loaded when executed, meaning that no N+1 problem happens.
+- `@where` filters rows when these arguments are passed.
+- `@first` will returns the first matching row.
+
+### Step 3. Create `KnexGql` instance
 
 ```typescript
-const typeDefs = fs.readFileSync('./schema.gql')
+import { KnexGql } from 'knex-gql'
+import Knex from 'knex'
+import fs from 'fs/promises'
 
-const knexGql = new KnexGql({ knex, typeDefs })
+export async function getKnexGql() {
+  const typeDefs = await fs.readFile('./schema.gql', 'utf8')
 
-await knexGql.query(gql`
-  mutation CreateUser {
-    createUser(input: { name: "Kay" }) {
-      id
-      name
-    }
-  }
-`).then(console.log)
-// {
-//   data: {
-//     createUser: {
-//       id: 'f8f37213-060b-4b6d-843c-5fc498bcbc08',
-//       name: 'Kay'
-//     }
-//   }
-// }
+  const knex = Knex({
+    client: 'pg',
+    connection: 'postgres://postgres:postgres@127.0.0.1:11155/postgres',
+  })
 
-await knexGql.query(gql`
-  query GetUser {
-    user(name: "Kay") {
-      id
-      name
-    }
-  }
-`).then(console.log)
-// {
-//   data: {
-//     user: {
-//       id: 'f8f37213-060b-4b6d-843c-5fc498bcbc08',
-//       name: 'Kay'
-//     }
-//   }
-// }
+  const knexGql = new KnexGql({ knex, typeDefs })
 
+  await knexGql.prepareTableColumnsMap() // This loads column info before execution
 
+  return knexGql
+}
 ```
+
+### Step 4. Run Query
+
+```typescript
+import { gql } from 'knex-gql'
+
+getKnexGql().then(async (knexGql) => {
+  await knexGql
+    .query(
+      gql`
+        mutation CreateUser {
+          createUser(input: { name: "Kay" }) {
+            id
+            name
+          }
+        }
+      `,
+    )
+    .then(console.log)
+  // Output:
+  // {
+  //   data: {
+  //     createUser: {
+  //       id: 'f8f37213-060b-4b6d-843c-5fc498bcbc08',
+  //       name: 'Kay'
+  //     }
+  //   }
+  // }
+
+  await knexGql
+    .query(
+      gql`
+        query GetUser {
+          user(name: "Kay") {
+            id
+            name
+          }
+        }
+      `,
+    )
+    .then(console.log)
+  // Output:
+  // {
+  //   data: {
+  //     user: {
+  //       id: 'f8f37213-060b-4b6d-843c-5fc498bcbc08',
+  //       name: 'Kay'
+  //     }
+  //   }
+  // }
+})
+```
+
+# Features
+
+- Automatically batch loads to avoid N+1
+- Automatically select required columns based on fields set
+- Middleware and custom resolver available
+
+// Documentation todo
 
 ## Directives
 
-| name         | description                           |
-| ------------ | ------------------------------------- |
-| @all         | Get all matching records              |
-| @belongsTo   | Get the parent record of given type   |
-| @first       | Get the first matching record         |
-| @hasMany     | Get child records with pagination     |
-| @insert      | Insert a record into the type's table |
-| @paginate    | Paginate matching records             |
-| @table       | Map table and type                    |
-| @useResolver | Declare to use a custom resolver      |
-| @where       | Add `where` clause for current query  |
+| name       | description                           |
+| ---------- | ------------------------------------- |
+| @all       | Get all matching records              |
+| @belongsTo | Get the parent record of given type   |
+| @first     | Get the first matching record         |
+| @hasMany   | Get child records with pagination     |
+| @insert    | Insert a record into the type's table |
+| @paginate  | Paginate matching records             |
+| @table     | Map table and type                    |
+| @where     | Add `where` clause for current query  |
+
+For more details, please see Sample app. https://github.com/acro5piano/knex-gql-sample-app
