@@ -93,9 +93,9 @@ export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
       return (
         code +
         '\n' +
-        `  ${field.name.value}${mark}: ResolverFn<${this.leafToTs(
-          field.type,
-        )}, ${parentName}, IKnexGqlContext, ${args ? args : '{}'}>`
+        `  ${field.name.value}${mark}: ResolverFn<${this.leafToTs(field.type)}${
+          mark === '?' ? '| undefined | null' : ''
+        }, ${parentName}, IKnexGqlContext, ${args ? args : '{}'}>`
       )
     }, '')
   }

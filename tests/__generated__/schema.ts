@@ -135,12 +135,12 @@ export type LoginPayloadResolvers = {
 }
 
 export type QueryResolvers = {
-  user?: ResolverFn<User, Query, IKnexGqlContext, QueryUserArgs>
-  firstUser?: ResolverFn<User, Query, IKnexGqlContext, {}>
+  user?: ResolverFn<User| undefined | null, Query, IKnexGqlContext, QueryUserArgs>
+  firstUser?: ResolverFn<User| undefined | null, Query, IKnexGqlContext, {}>
   allUsers: ResolverFn<User[], Query, IKnexGqlContext, {}>
   users: ResolverFn<User[], Query, IKnexGqlContext, QueryUsersArgs>
-  post?: ResolverFn<Post, Query, IKnexGqlContext, QueryPostArgs>
-  viewer?: ResolverFn<User, Query, IKnexGqlContext, {}>
+  post?: ResolverFn<Post| undefined | null, Query, IKnexGqlContext, QueryPostArgs>
+  viewer?: ResolverFn<User| undefined | null, Query, IKnexGqlContext, {}>
 }
 
 export type MutationResolvers = {

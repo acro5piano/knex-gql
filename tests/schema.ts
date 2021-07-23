@@ -8,6 +8,14 @@ import { LoginMutation } from './resolvers/LoginMutation'
 import { UserField } from './resolvers/UserField'
 import { ViewerQuery } from './resolvers/ViewerQuery'
 
+interface AppContext {
+  userId?: string
+}
+
+declare module './__generated__/schema' {
+  interface IKnexGqlContext extends AppContext {}
+}
+
 const typeDefs = gql`
   type User @table(name: "users") {
     id: ID!
