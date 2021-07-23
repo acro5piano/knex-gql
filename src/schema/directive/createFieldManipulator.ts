@@ -9,24 +9,23 @@ import type { IDirective } from '../../interfaces'
 import type { KnexGql } from '../../knex-gql'
 import { getRawType } from '../../util'
 
-// TODO: later, we should strongly type this
-type SchemaMapper = (appValues: {
+type SchemaMapper<DirectiveArgs> = (appValues: {
   knexGql: KnexGql
   fieldConfig: GraphQLFieldConfig<any, any>
   targetType: GraphQLType
   targetTableName?: string
   originalResolve?: GraphQLFieldResolver<any, any>
-  directiveArgumentMap: object
+  directiveArgumentMap: DirectiveArgs
 }) => GraphQLFieldConfig<any, any>
 
-interface CreateFieldManipulatorOption {
+interface CreateFieldManipulatorOption<DirectiveArgs> {
   name: string
   definition: string
-  schemaMapper: SchemaMapper
+  schemaMapper: SchemaMapper<DirectiveArgs>
 }
 
-export function createFieldManipulator(
-  option: CreateFieldManipulatorOption,
+export function createFieldManipulator<DirectiveArgs>(
+  option: CreateFieldManipulatorOption<DirectiveArgs>,
 ): IDirective {
   return {
     name: option.name,

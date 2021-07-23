@@ -1,16 +1,14 @@
-import { MapperKind, getDirectives, mapSchema } from '@graphql-tools/utils'
 import { GraphQLInt } from 'graphql'
 
+import { HasManyDirectiveArgs } from '../__generated__/schema'
 import { applyWhereToQuery } from '../execution/applyWhereToQuery'
-import { IContext, IDirective } from '../interfaces'
+import { IContext } from '../interfaces'
 import { createFieldManipulator } from '../schema/directive/createFieldManipulator'
-import { getArgumentValuesByDirectiveName, getRawType, gql } from '../util'
-
-type HasManyType = 'PAGINATOR' | 'SIMPLE'
+import { getArgumentValuesByDirectiveName, gql } from '../util'
 
 const DEFAULT_LIMIT = 20
 
-export const HasManyDirective: IDirective = createFieldManipulator({
+export const HasManyDirective = createFieldManipulator<HasManyDirectiveArgs>({
   name: 'hasMany',
   definition: gql`
     enum HasManyType {
@@ -28,8 +26,8 @@ export const HasManyDirective: IDirective = createFieldManipulator({
       'where',
       fieldConfig.astNode?.arguments,
     )
-    const type: HasManyType = directiveArgumentMap['type']
-    const limit: number = directiveArgumentMap['limit'] || DEFAULT_LIMIT
+    const type = directiveArgumentMap.type
+    const limit = directiveArgumentMap['limit'] || DEFAULT_LIMIT
     switch (type) {
       case 'SIMPLE':
         fieldConfig.resolve = (root, args, ctx: IContext) => {

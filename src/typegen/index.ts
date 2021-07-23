@@ -1,5 +1,7 @@
 import { getDocumentNodeFromSchema } from '@graphql-tools/utils'
 import {
+  DirectiveDefinitionNode,
+  EnumTypeDefinitionNode,
   FieldDefinitionNode,
   GraphQLSchema,
   InputValueDefinitionNode,
@@ -50,15 +52,51 @@ export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
       if (!node) {
         return ''
       }
+      if (node.kind === 'DirectiveDefinition') {
+        return code + this.directiveToTs(node)
+      }
+      if (node.kind === 'EnumTypeDefinition') {
+        return code + this.enumToTs(node)
+      }
       if (
         node.kind === 'ObjectTypeDefinition' ||
         node.kind === 'InputObjectTypeDefinition'
       ) {
         // TODO: object and input are almost same
-        return code + '\n\n' + this.objectTypeToTS(node as any)
+        return (
+          code + '\n\n' + this.objectTypeToTS(node as ObjectTypeDefinitionNode)
+        )
       }
       return code
     }, '')
+  }
+
+  directiveToTs(node: DirectiveDefinitionNode) {
+    let directiveCode = ''
+    if (node.arguments && node.arguments.length > 0) {
+      directiveCode += '\n\n'
+      const args = node.arguments.reduce((code, arg) => {
+        const mark =
+          arg.type.kind === 'NonNullType' || arg.defaultValue ? '' : '?'
+        return code + `\n  ${arg.name.value}${mark}: ${this.leafToTs(arg.type)}`
+      }, '')
+      directiveCode += `export interface ${capitalizeStr(
+        node.name.value,
+      )}DirectiveArgs {${args}\n}`
+    }
+    return directiveCode
+  }
+
+  enumToTs(node: EnumTypeDefinitionNode) {
+    if (!node.values) {
+      return ''
+    }
+    const values = node.values
+      .map((val) => `'${val.name.value}'`)
+      .join('\n  | ')
+    let directiveCode = `\n\nexport type ${node.name.value} = \n  | ${values}`
+
+    return directiveCode
   }
 
   objectTypeToTS(type: ObjectTypeDefinitionNode) {

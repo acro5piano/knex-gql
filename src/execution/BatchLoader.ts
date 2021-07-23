@@ -1,20 +1,16 @@
 import Dataloader from 'dataloader'
 import { Knex } from 'knex'
 
+import type { SimplePagenatorArgs } from '../interfaces'
 import type { KnexGql } from '../knex-gql'
 
 type LoaderType = 'hasMany' | 'belongsTo'
-
-type Page = {
-  limit: number
-  offset: number
-}
 
 interface GetLoaderProps {
   type: LoaderType
   targetTable: string
   foreignKey?: string
-  page?: Page
+  page?: SimplePagenatorArgs
   queryModifier?: (query: Knex.QueryBuilder) => void
 }
 

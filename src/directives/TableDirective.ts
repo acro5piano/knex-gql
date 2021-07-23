@@ -1,26 +1,14 @@
-import { MapperKind, getDirectives, mapSchema } from '@graphql-tools/utils'
-
-import { IDirective } from '../interfaces'
+import { TableDirectiveArgs } from '../__generated__/schema'
+import { createObjectTypeManipulator } from '../schema/directive/createObjectTypeManipulator'
 import { gql } from '../util'
 
-export const TableDirective: IDirective = {
+export const TableDirective = createObjectTypeManipulator<TableDirectiveArgs>({
   name: 'table',
   definition: gql`
     directive @table(name: String!) on OBJECT
   `,
-  getSchemaTransformer: (knexGql) => {
-    return function createDirective(schema) {
-      return mapSchema(schema, {
-        [MapperKind.OBJECT_TYPE]: (type) => {
-          const directives = getDirectives(schema, type)
-          const directiveArgumentMap = directives['table']
-          if (directiveArgumentMap) {
-            const { name } = directiveArgumentMap
-            knexGql.tableNameMap.set(type.name, name)
-          }
-          return type
-        },
-      })
-    }
+  schemaMapper: ({ knexGql, directiveArgumentMap, type }) => {
+    knexGql.tableNameMap.set(type.name, directiveArgumentMap.name)
+    return type
   },
-}
+})

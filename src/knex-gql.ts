@@ -30,7 +30,7 @@ interface KnexGqlOptions {
   fieldResolvers?: ICustomFieldResolver[]
   emitSchema?: boolean | string
   emitTypeScriptDefs?: boolean | string
-  resolvers: IResolvers
+  resolvers?: IResolvers
 }
 
 export class KnexGql {
@@ -48,7 +48,7 @@ export class KnexGql {
     fieldResolvers = [],
     emitSchema = false,
     emitTypeScriptDefs = false,
-    resolvers,
+    resolvers = {},
   }: KnexGqlOptions) {
     this.knex = knex
     this.errorHandler = errorHandler

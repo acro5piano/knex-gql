@@ -15,6 +15,42 @@ export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
 }
   
 
+export interface TableDirectiveArgs {
+  name: string
+}
+
+export interface BelongsToDirectiveArgs {
+  foreignKey: string
+}
+
+export interface HasManyDirectiveArgs {
+  foreignKey: string
+  type: HasManyType
+  limit: number
+}
+
+export interface WhereDirectiveArgs {
+  operator: string
+}
+
+export interface PaginateDirectiveArgs {
+  queryBuilder?: string
+  limit: number
+}
+
+export interface UseResolverDirectiveArgs {
+  resolver: string
+}
+
+export interface DateFormatDirectiveArgs {
+  key: string
+  format: string
+}
+
+export type HasManyType = 
+  | 'PAGINATOR'
+  | 'SIMPLE'
+
 export interface User {
   id: string
   name: string

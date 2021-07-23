@@ -39,3 +39,8 @@ export interface ICustomFieldDirective {
   definition: string
   resolve: DirectiveResolverFn<any, IContext>
 }
+
+export type SimplePagenatorArgs = {
+  limit: number
+  offset: number
+}

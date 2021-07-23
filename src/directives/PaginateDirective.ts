@@ -1,10 +1,11 @@
 import { GraphQLInt } from 'graphql'
 
+import { PaginateDirectiveArgs } from '../__generated__/schema'
 import { getKnexQuery } from '../execution/getKnexQuery'
 import { createFieldManipulator } from '../schema/directive/createFieldManipulator'
 import { gql } from '../util'
 
-export const PaginateDirective = createFieldManipulator({
+export const PaginateDirective = createFieldManipulator<PaginateDirectiveArgs>({
   name: 'paginate',
   definition: gql`
     directive @paginate(
@@ -19,7 +20,7 @@ export const PaginateDirective = createFieldManipulator({
     knexGql,
     directiveArgumentMap,
   }) => {
-    const limit = directiveArgumentMap['limit']
+    const limit = directiveArgumentMap.limit
     if (!fieldConfig.args) {
       fieldConfig.args = {}
     }
