@@ -2,7 +2,6 @@ import Dataloader from 'dataloader'
 import { Knex } from 'knex'
 
 import type { ISimplePagenatorArgs } from '../interfaces'
-import type { KnexGql } from '../knex-gql'
 
 type LoaderType = 'hasMany' | 'hasManyThrough' | 'belongsTo'
 
@@ -26,7 +25,7 @@ interface CreateLoaderProps extends GetLoaderProps {
 export class BatchLoader {
   private loaderMap = new Map<string, Dataloader<any, any>>()
 
-  constructor(private knexGql: KnexGql) {}
+  constructor(private knex: Knex) {}
 
   getLoader({
     type,
@@ -48,7 +47,7 @@ export class BatchLoader {
       targetTable,
       foreignKey,
       through,
-      knex: this.knexGql.knex,
+      knex: this.knex,
       page,
       queryModifier,
     })
