@@ -174,7 +174,7 @@ export class KnexGql {
 
   mergeKnexGqlContext<T>(givenCtx: T) {
     return {
-      batchLoader: new BatchLoader(this),
+      batchLoader: new BatchLoader(this.knex),
       ...(typeof givenCtx === 'function' ? givenCtx() : givenCtx),
     }
   }
