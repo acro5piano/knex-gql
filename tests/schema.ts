@@ -105,5 +105,8 @@ export const knexGql = new KnexGql({
     User: UserField,
   } as Partial<Resolvers>,
   emitSchema: path.resolve(__dirname, '__generated__/schema.gql'),
-  emitTypeScriptDefs: path.resolve(__dirname, '__generated__/schema.ts'),
+  emitTypeScriptDefs: {
+    path: path.resolve(__dirname, '__generated__/schema.ts'),
+    moduleName: '../../src',
+  },
 })

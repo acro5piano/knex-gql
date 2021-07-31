@@ -1,15 +1,16 @@
 /* eslint-disable */
-import { GraphQLResolveInfo } from 'graphql';
+import { GraphQLResolveInfo } from 'graphql'
+import { KnexGqlContext } from '../../src'
 
 export type ResolverFn<TResult, TParent, TContext, TArgs> = (
   parent: TParent,
   args: TArgs,
   context: TContext,
   info: GraphQLResolveInfo
-) => Promise<TResult> | TResult;
+) => Promise<TResult> | TResult
 
 export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
-  resolve: ResolverFn<TResult, TParent, TContext, TArgs>;
+  resolve: ResolverFn<TResult, TParent, TContext, TArgs>
 }
   
 

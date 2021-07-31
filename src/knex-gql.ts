@@ -28,6 +28,11 @@ import { getMapValues, keys } from './util'
 
 type ErrorHandler = (errors: ReadonlyArray<GraphQLError>) => any
 
+interface EmitTypeScriptDefsOption {
+  path: string
+  moduleName?: string
+}
+
 interface KnexGqlOptions {
   knex: Knex
   typeDefs: string
@@ -35,7 +40,7 @@ interface KnexGqlOptions {
   errorHandler?: ErrorHandler
   fieldResolvers?: ICustomFieldResolver[]
   emitSchema?: boolean | string
-  emitTypeScriptDefs?: boolean | string
+  emitTypeScriptDefs?: boolean | string | EmitTypeScriptDefsOption
   resolvers?: IResolvers
 }
 
@@ -112,9 +117,16 @@ export class KnexGql {
     }
 
     if (emitTypeScriptDefs !== false) {
-      const fileName =
-        emitTypeScriptDefs === true ? 'schema.ts' : emitTypeScriptDefs
-      fs.writeFile(fileName, this.schemaToTypeScriptSchema(), 'utf8')
+      let fileName = 'schema.ts'
+      let moduleName: string | undefined = 'knex-gql'
+      if (typeof emitTypeScriptDefs === 'string') {
+        fileName = emitTypeScriptDefs
+      }
+      if (typeof emitTypeScriptDefs === 'object') {
+        fileName = emitTypeScriptDefs.path
+        moduleName = emitTypeScriptDefs.moduleName
+      }
+      fs.writeFile(fileName, this.schemaToTypeScriptSchema(moduleName), 'utf8')
     }
   }
 
@@ -122,8 +134,8 @@ export class KnexGql {
     return printSchema(this.schema)
   }
 
-  schemaToTypeScriptSchema() {
-    return new TypeScriptSchemaGetter(this.schema).getCode()
+  schemaToTypeScriptSchema(moduleName = 'knex-gql') {
+    return new TypeScriptSchemaGetter(this.schema, moduleName).getCode()
   }
 
   async prepareTableColumnsMap() {

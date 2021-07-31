@@ -10,27 +10,15 @@ import {
 } from 'graphql'
 
 export class TypeScriptSchemaGetter {
-  code = `/* eslint-disable */
-import { GraphQLResolveInfo } from 'graphql';
-
-export type ResolverFn<TResult, TParent, TContext, TArgs> = (
-  parent: TParent,
-  args: TArgs,
-  context: TContext,
-  info: GraphQLResolveInfo
-) => Promise<TResult> | TResult;
-
-export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
-  resolve: ResolverFn<TResult, TParent, TContext, TArgs>;
-}
-  `
+  code = ''
   argumentCode = ''
   resolversCode = ''
   allResolverCode = 'export interface Resolvers {'
 
-  constructor(private schema: GraphQLSchema) {}
+  constructor(private schema: GraphQLSchema, private moduleName: string) {}
 
   getCode() {
+    this.code += this.getInitialCode()
     this.code += this.getTypeScriptSchema()
     return (
       this.code +
@@ -42,6 +30,24 @@ export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
       this.allResolverCode +
       '\n}'
     )
+  }
+
+  getInitialCode() {
+    return `/* eslint-disable */
+import { GraphQLResolveInfo } from 'graphql'
+import { KnexGqlContext } from '${this.moduleName}'
+
+export type ResolverFn<TResult, TParent, TContext, TArgs> = (
+  parent: TParent,
+  args: TArgs,
+  context: TContext,
+  info: GraphQLResolveInfo
+) => Promise<TResult> | TResult
+
+export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
+  resolve: ResolverFn<TResult, TParent, TContext, TArgs>
+}
+  `
   }
 
   getTypeScriptSchema() {
